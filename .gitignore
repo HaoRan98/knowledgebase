@@ -1,0 +1,9 @@
+.idea/
+.DS_Store
+*.exe
+*.log
+.pem
+!runtime/fonts
+!runtime/bg.jpg
+knowledgebase
+consul.exe

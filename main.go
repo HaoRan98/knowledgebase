@@ -1,13 +1,13 @@
 package main
 
 import (
-	"fmt"
-	"github.com/gin-gonic/gin"
 	"NULL/knowledgebase/models"
 	"NULL/knowledgebase/pkg/logging"
 	"NULL/knowledgebase/pkg/setting"
 	"NULL/knowledgebase/pkg/util"
 	"NULL/knowledgebase/routers"
+	"fmt"
+	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"os"
@@ -55,12 +55,12 @@ func main() {
 	//创建监听退出chan
 	c := make(chan os.Signal)
 	//监听指定信号 ctrl+c kill
-	signal.Notify(c, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+	signal.Notify(c, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 	go func() {
 		log.Println("监听进程启动...")
 		for s := range c {
 			switch s {
-			case syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT:
+			case syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT:
 				log.Println("退出", s)
 				ExitFunc()
 			default:

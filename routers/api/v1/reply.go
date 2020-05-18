@@ -66,36 +66,40 @@ func PostReply(c *gin.Context) {
 	}
 
 	BroadCastCount()
+
 	// 通知发帖人
 	topic, err := models.GetTopic(form.TopicID)
 	if err != nil {
 		log.Println("GetTopic in reply err:", err)
+	} else {
+		msg := fmt.Sprintf("您发布的帖子:\"%s\",收到一条新回帖", topic.Title)
+		notice := &models.Notice{
+			ID:      "NTE-" + util.RandomString(28),
+			TopicID: topic.ID,
+			Account: topic.Account,
+			Msg:     msg,
+			Uptime:  t,
+		}
+		BroadCastReply(notice)
 	}
-	msg := fmt.Sprintf("您的发帖:%s ,收到一条新回帖", topic.Title)
-	notice := &models.Notice{
-		ID:      "NTE-" + util.RandomString(28),
-		TopicID: topic.ID,
-		Account: topic.Account,
-		Msg:     msg,
-		Uptime:  t,
-	}
-	BroadCastReply(notice)
+
 	// 通知收藏人
 	favorites, err := models.GetCollector(form.TopicID)
 	if err != nil {
 		log.Println("GetCollector in reply err:", err)
-	}
-	if len(favorites) > 0 {
-		msg := fmt.Sprintf("您收藏的帖子:%s ,收到一条新回帖", topic.Title)
-		for _, favorite := range favorites {
-			notice := &models.Notice{
-				ID:      "NTE-" + util.RandomString(28),
-				TopicID: form.TopicID,
-				Account: favorite.Account,
-				Msg:     msg,
-				Uptime:  t,
+	} else {
+		if len(favorites) > 0 {
+			msg := fmt.Sprintf("您收藏的帖子:\"%s\" ,收到一条新回帖", topic.Title)
+			for _, favorite := range favorites {
+				notice := &models.Notice{
+					ID:      "NTE-" + util.RandomString(28),
+					TopicID: form.TopicID,
+					Account: favorite.Account,
+					Msg:     msg,
+					Uptime:  t,
+				}
+				BroadCastReply(notice)
 			}
-			BroadCastReply(notice)
 		}
 	}
 
@@ -141,38 +145,43 @@ func EditReply(c *gin.Context) {
 	}
 
 	BroadCastCount()
+
 	// 通知发帖人
-	topic, err := models.GetTopic(form.TopicID)
+	topic, err := models.GetTopic(replyEs.TopicID)
 	if err != nil {
 		log.Println("GetTopic in reply err:", err)
+	} else {
+		msg := fmt.Sprintf("您发布的帖子:\"%s\" ,收到一条新回帖", topic.Title)
+		notice := &models.Notice{
+			ID:      "NTE-" + util.RandomString(28),
+			TopicID: topic.ID,
+			Account: topic.Account,
+			Msg:     msg,
+			Uptime:  t,
+		}
+		BroadCastReply(notice)
 	}
-	msg := fmt.Sprintf("您的发帖:%s ,收到一条新回帖", topic.Title)
-	notice := &models.Notice{
-		ID:      "NTE-" + util.RandomString(28),
-		TopicID: form.TopicID,
-		Account: topic.Account,
-		Msg:     msg,
-		Uptime:  t,
-	}
-	BroadCastReply(notice)
+
 	// 通知收藏人
 	favorites, err := models.GetCollector(form.TopicID)
 	if err != nil {
 		log.Println("GetCollector in reply err:", err)
-	}
-	if len(favorites) > 0 {
-		msg := fmt.Sprintf("您的发帖:%s ,收到一条新回帖", topic.Title)
-		for _, favorite := range favorites {
-			notice := &models.Notice{
-				ID:      "NTE-" + util.RandomString(28),
-				TopicID: form.TopicID,
-				Account: favorite.Account,
-				Msg:     msg,
-				Uptime:  t,
+	} else {
+		if len(favorites) > 0 {
+			msg := fmt.Sprintf("您收藏的帖子:\"%s\" ,收到一条新回帖", topic.Title)
+			for _, favorite := range favorites {
+				notice := &models.Notice{
+					ID:      "NTE-" + util.RandomString(28),
+					TopicID: form.TopicID,
+					Account: favorite.Account,
+					Msg:     msg,
+					Uptime:  t,
+				}
+				BroadCastReply(notice)
 			}
-			BroadCastReply(notice)
 		}
 	}
+
 	appG.Response(http.StatusOK, e.SUCCESS, nil)
 }
 

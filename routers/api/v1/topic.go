@@ -113,6 +113,7 @@ func PostTopic(c *gin.Context) {
 
 	BroadCastTopic()
 	BroadCastCount()
+
 	appG.Response(http.StatusOK, e.SUCCESS, nil)
 }
 func EditTopic(c *gin.Context) {

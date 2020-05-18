@@ -5,7 +5,6 @@ import (
 	"NULL/knowledgebase/pkg/app"
 	"NULL/knowledgebase/pkg/e"
 	"NULL/knowledgebase/pkg/util"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -67,20 +66,22 @@ func PostComment(c *gin.Context) {
 	}
 
 	BroadCastCount()
+
 	// 通知回帖人
 	reply, err := models.GetReply(form.ReplyID)
 	if err != nil {
-		log.Println("GetTopic in reply err:", err)
+		log.Println("GetTopic in comment err:", err)
+	} else {
+		notice := &models.Notice{
+			ID:      "NTE-" + util.RandomString(28),
+			TopicID: reply.TopicID,
+			Account: reply.Account,
+			Msg:     "您的回帖收到一条新评论",
+			Uptime:  t,
+		}
+		BroadCastReply(notice)
 	}
-	msg := fmt.Sprintf("您的回帖:%s ,收到一条新评论", reply.ID)
-	notice := &models.Notice{
-		ID:      "NTE-" + util.RandomString(28),
-		TopicID: reply.TopicID,
-		Account: reply.Account,
-		Msg:     msg,
-		Uptime:  t,
-	}
-	BroadCastReply(notice)
+
 	appG.Response(http.StatusOK, e.SUCCESS, nil)
 }
 func EditComment(c *gin.Context) {
@@ -123,20 +124,21 @@ func EditComment(c *gin.Context) {
 	}
 
 	BroadCastCount()
+
 	// 通知回帖人
-	reply, err := models.GetReply(form.ReplyID)
+	reply, err := models.GetReply(commentEs.ReplyID)
 	if err != nil {
-		log.Println("GetTopic in reply err:", err)
+		log.Println("GetTopic in comment err:", err)
+	} else {
+		notice := &models.Notice{
+			ID:      "NTE-" + util.RandomString(28),
+			TopicID: reply.TopicID,
+			Account: reply.Account,
+			Msg:     "您的回帖收到一条新评论",
+			Uptime:  t,
+		}
+		BroadCastReply(notice)
 	}
-	msg := fmt.Sprintf("您的回帖:%s ,收到一条新评论", reply.ID)
-	notice := &models.Notice{
-		ID:      "NTE-" + util.RandomString(28),
-		TopicID: reply.TopicID,
-		Account: reply.Account,
-		Msg:     msg,
-		Uptime:  t,
-	}
-	BroadCastReply(notice)
 
 	appG.Response(http.StatusOK, e.SUCCESS, nil)
 }

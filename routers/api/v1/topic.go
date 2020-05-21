@@ -24,6 +24,12 @@ type TopicForm struct {
 	Deptname string `json:"deptname"`
 }
 
+type TpResp struct {
+	*models.Topic
+	Replys []*RpResp
+	Agreed bool `json:"agreed"`
+}
+
 func ImpTopic(c *gin.Context) {
 	var (
 		appG = app.Gin{C: c}
@@ -185,17 +191,20 @@ func GetTopic(c *gin.Context) {
 		//浏览量+1
 		models.AddBrowse(topic.ID)
 		BroadCastCount()
-		appG.Response(http.StatusOK, e.SUCCESS, topic)
+
+		loginId := util.GetLoginID("", c)
+		replyResps := make([]*RpResp, 0)
+		for _, rp := range topic.Replys {
+			rpFlag := models.IsAgreed(rp.ID, loginId)
+			reply := rp
+			replyResps = append(replyResps, &RpResp{&reply, nil, rpFlag})
+		}
+		tpFlag := models.IsAgreed(topic.ID, loginId)
+		appG.Response(http.StatusOK, e.SUCCESS, TpResp{topic, replyResps, tpFlag})
 		return
 	}
 	appG.Response(http.StatusOK, e.SUCCESS, nil)
 }
-
-type TpResp struct {
-	*models.Topic
-	Agreed bool `json:"agreed"`
-}
-
 func GetTopics(c *gin.Context) {
 	var (
 		appG     = app.Gin{C: c}
@@ -237,8 +246,15 @@ func GetTopics(c *gin.Context) {
 	if len(topics) > 0 {
 		tpResps := make([]TpResp, 0)
 		for _, tp := range topics {
-			flag := models.IsAgreed(tp.ID)
-			tpResps = append(tpResps, TpResp{tp, flag})
+			loginId := util.GetLoginID("", c)
+			replyResps := make([]*RpResp, 0)
+			for _, rp := range tp.Replys {
+				rpFlag := models.IsAgreed(rp.ID, loginId)
+				reply := rp
+				replyResps = append(replyResps, &RpResp{&reply, nil, rpFlag})
+			}
+			tpFlag := models.IsAgreed(tp.ID, loginId)
+			tpResps = append(tpResps, TpResp{tp, replyResps, tpFlag})
 		}
 		appG.Response(http.StatusOK, e.SUCCESS,
 			map[string]interface{}{

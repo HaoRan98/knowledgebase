@@ -22,6 +22,12 @@ type ReplyForm struct {
 	Deptname string `json:"deptname"`
 }
 
+type RpResp struct {
+	*models.Reply
+	Comments []*CtResp
+	Agreed   bool `json:"agreed"`
+}
+
 func PostReply(c *gin.Context) {
 	var (
 		appG = app.Gin{C: c}
@@ -184,12 +190,6 @@ func EditReply(c *gin.Context) {
 
 	appG.Response(http.StatusOK, e.SUCCESS, nil)
 }
-
-type RpResp struct {
-	*models.Reply
-	Agreed bool `json:"agreed"`
-}
-
 func GetReplies(c *gin.Context) {
 	var (
 		appG     = app.Gin{C: c}
@@ -225,10 +225,17 @@ func GetReplies(c *gin.Context) {
 		return
 	}
 	if len(replies) > 0 {
-		rpResps := make([]RpResp, 0)
+		rpResps := make([]*RpResp, 0)
 		for _, rp := range replies {
-			flag := models.IsAgreed(rp.ID)
-			rpResps = append(rpResps, RpResp{rp, flag})
+			loginId := util.GetLoginID("", c)
+			ctResps := make([]*CtResp, 0)
+			for _, ct := range rp.Comments {
+				ctFlag := models.IsAgreed(ct.ID, loginId)
+				comment := ct
+				ctResps = append(ctResps, &CtResp{&comment, ctFlag})
+			}
+			rpFlag := models.IsAgreed(rp.ID, loginId)
+			rpResps = append(rpResps, &RpResp{rp, ctResps, rpFlag})
 		}
 		appG.Response(http.StatusOK, e.SUCCESS,
 			map[string]interface{}{

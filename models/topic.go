@@ -44,7 +44,10 @@ func AddBrowse(id string) {
 }
 func GetTopic(id string) (*Topic, error) {
 	var topic Topic
-	if err := db.Where("id=?", id).First(&topic).Error; err != nil {
+	if err := db.Preload("Replys", func(db *gorm.DB) *gorm.DB {
+		return db.Order("reply.accept,reply.floor")
+	}).
+		Where("id=?", id).First(&topic).Error; err != nil {
 		return nil, err
 	}
 	if len(topic.ID) > 0 {

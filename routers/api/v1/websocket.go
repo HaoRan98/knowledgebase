@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"gopkg.in/olahol/melody.v1"
-	"html/template"
 	"log"
 	"sync"
 )
@@ -150,26 +149,33 @@ func BroadCastTopic() {
 		log.Printf("send topic msg err\n ERR:%v", err)
 		return
 	}
-	tpResps := make([]TpResp, 0)
-	for _, tp := range topics {
-		flag := models.IsAgreed(tp.ID)
-		tpResps = append(tpResps, TpResp{tp, flag})
-	}
-	resp := map[string]interface{}{
-		"list": tpResps,
-		"cnt":  models.GetTopicsCnt(""),
-	}
-	msg := WsMsg{
-		MsType: "topic",
-		Data:   resp,
-	}
-	msgJsons, err := json.Marshal(msg)
-	if err != nil {
-		log.Printf("broadcast topic fail at marshal json.\n ERR:%v", err)
-		return
-	}
 	Clients.Range(func(s, u interface{}) bool {
-		err := s.(*melody.Session).Write(msgJsons)
+		tpResps := make([]TpResp, 0)
+		for _, topic := range topics {
+			loginId := u.(*models.SysUser).UserAccount
+			replyResps := make([]*RpResp, 0)
+			for _, rp := range topic.Replys {
+				rpFlag := models.IsAgreed(rp.ID, loginId)
+				reply := rp
+				replyResps = append(replyResps, &RpResp{&reply, nil, rpFlag})
+			}
+			tpFlag := models.IsAgreed(topic.ID, loginId)
+			tpResps = append(tpResps, TpResp{topic, replyResps, tpFlag})
+		}
+		resp := map[string]interface{}{
+			"list": tpResps,
+			"cnt":  models.GetTopicsCnt(""),
+		}
+		msg := WsMsg{
+			MsType: "topic",
+			Data:   resp,
+		}
+		msgJsons, err := json.Marshal(msg)
+		if err != nil {
+			log.Printf("broadcast topic fail at marshal json.\n ERR:%v", err)
+			return true
+		}
+		err = s.(*melody.Session).Write(msgJsons)
 		if err != nil {
 			log.Printf("send topic msg err\n ERR:%v", err)
 		}
@@ -245,11 +251,4 @@ func BroadCastCount() {
 		}
 		return true
 	})
-}
-
-func Home(c *gin.Context) {
-	if c.Request.Method == "GET" {
-		t, _ := template.ParseFiles("runtime/static/index.html")
-		util.ShowError("template parseFiles err", t.Execute(c.Writer, nil))
-	}
 }

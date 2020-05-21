@@ -10,6 +10,7 @@ import (
 type Comment struct {
 	ID        string     `json:"id" gorm:"primary_key"`
 	DeletedAt *time.Time `sql:"index"`
+	TopicID   string     `json:"topic_id"`
 	ReplyID   string     `json:"reply_id"`
 	Floor     int        `json:"floor" gorm:"COMMENT:'楼层'"`
 	Content   string     `json:"content" gorm:"COMMENT:'评论内容';size:65535"`

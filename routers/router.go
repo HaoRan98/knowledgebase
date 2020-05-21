@@ -22,8 +22,8 @@ func InitRouter() *gin.Engine {
 	r.Use(gin.Recovery())
 	r.Use(cors.CORSMiddleware())
 
-	r.GET("/", v1.Home)
-	r.GET("/klib", v1.Home)
+	r.GET("/", api.Home)
+	r.GET("/klib", api.Home)
 	r.StaticFS("/export", http.Dir(export.GetExcelFullPath()))
 	r.StaticFS("/qrcode", http.Dir(qrcode.GetQrCodeFullPath()))
 	r.Static("/css", "runtime/static/css")

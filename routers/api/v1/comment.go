@@ -22,6 +22,11 @@ type CommentForm struct {
 	Deptname string `json:"deptname"`
 }
 
+type CtResp struct {
+	*models.Comment
+	Agreed bool `json:"agreed"`
+}
+
 func PostComment(c *gin.Context) {
 	var (
 		appG = app.Gin{C: c}
@@ -37,9 +42,16 @@ func PostComment(c *gin.Context) {
 		appG.Response(http.StatusInternalServerError, e.ERROR, err)
 		return
 	}
+	reply, err := models.GetReply(form.ReplyID)
+	if err != nil {
+		log.Println("GetTopic in comment err:", err)
+		appG.Response(http.StatusInternalServerError, e.ERROR, err)
+		return
+	}
 	t := time.Now().Format("2006-01-02 15:04:05")
 	comment := &models.Comment{
 		ID:       "CMT-" + util.RandomString(28),
+		TopicID:  reply.TopicID,
 		ReplyID:  form.ReplyID,
 		Content:  form.Content,
 		Author:   form.Author,
@@ -68,19 +80,14 @@ func PostComment(c *gin.Context) {
 	BroadCastCount()
 
 	// 通知回帖人
-	reply, err := models.GetReply(form.ReplyID)
-	if err != nil {
-		log.Println("GetTopic in comment err:", err)
-	} else {
-		notice := &models.Notice{
-			ID:      "NTE-" + util.RandomString(28),
-			TopicID: reply.TopicID,
-			Account: reply.Account,
-			Msg:     "您的回帖收到一条新评论",
-			Uptime:  t,
-		}
-		BroadCastReply(notice)
+	notice := &models.Notice{
+		ID:      "NTE-" + util.RandomString(28),
+		TopicID: reply.TopicID,
+		Account: reply.Account,
+		Msg:     "您的回帖收到一条新评论",
+		Uptime:  t,
 	}
+	BroadCastReply(notice)
 
 	appG.Response(http.StatusOK, e.SUCCESS, nil)
 }
@@ -142,12 +149,6 @@ func EditComment(c *gin.Context) {
 
 	appG.Response(http.StatusOK, e.SUCCESS, nil)
 }
-
-type CtResp struct {
-	*models.Comment
-	Agreed bool `json:"agreed"`
-}
-
 func GetComments(c *gin.Context) {
 	var (
 		appG     = app.Gin{C: c}
@@ -178,10 +179,11 @@ func GetComments(c *gin.Context) {
 		return
 	}
 	if len(comments) > 0 {
-		ctResps := make([]CtResp, 0)
+		ctResps := make([]*CtResp, 0)
 		for _, ct := range comments {
-			flag := models.IsAgreed(ct.ID)
-			ctResps = append(ctResps, CtResp{ct, flag})
+			loginId := util.GetLoginID("", c)
+			flag := models.IsAgreed(ct.ID, loginId)
+			ctResps = append(ctResps, &CtResp{ct, flag})
 		}
 		appG.Response(http.StatusOK, e.SUCCESS, ctResps)
 		return

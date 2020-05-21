@@ -61,7 +61,7 @@ func main() {
 		for s := range c {
 			switch s {
 			case syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT:
-				log.Println("退出", s)
+				log.Println("监控到退出信号:", s)
 				ExitFunc()
 			default:
 				log.Println("other signal", s)

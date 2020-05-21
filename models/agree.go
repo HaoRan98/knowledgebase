@@ -16,9 +16,9 @@ func Agreed(data interface{}) error {
 	return nil
 }
 
-func IsAgreed(agreeid string) bool {
+func IsAgreed(agreeid, account string) bool {
 	var agree Agree
-	err := db.Where("agreeid=?", agreeid).First(&agree).Error
+	err := db.Where("agreeid=? and account=?", agreeid, account).First(&agree).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
 		return true
 	}

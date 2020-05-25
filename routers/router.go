@@ -8,6 +8,9 @@ import (
 	"NULL/knowledgebase/pkg/upload"
 	"NULL/knowledgebase/routers/api"
 	v1 "NULL/knowledgebase/routers/api/v1"
+	v2 "NULL/knowledgebase/routers/api/v2"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"gopkg.in/olahol/melody.v1"
 	"net/http"
@@ -16,6 +19,10 @@ import (
 // InitRouter initialize routing information
 func InitRouter() *gin.Engine {
 	r := gin.New()
+
+	store := cookie.NewStore([]byte("secret"))
+	r.Use(sessions.Sessions("mysession", store))
+
 	var mr = melody.New()
 	mr.Config.MaxMessageSize = 40960 * 2
 	r.Use(gin.Logger())
@@ -97,6 +104,32 @@ func InitRouter() *gin.Engine {
 		apiv1.GET("/comment/agree/:id", v1.CommentAgree)
 		//删除评论
 		apiv1.GET("/comment/del/:id", v1.DelComment)
+	}
+
+	apiv2 := r.Group("/api/v2")
+	apiv2.Use(jwt.JWT())
+	{
+		// 获取用户信息,存入session
+		apiv2.POST("/jkxm/userinfo", v1.UserInfo)
+		// 导入监控项目
+		apiv2.POST("/jkxm/imp", v2.ImpJkxm)
+		// 监控项目录入审核
+		apiv2.POST("/jkxm/lrsh", v2.ShJkxm)
+		// 根据审核标志获取对应项目列表(录入审核)
+		apiv2.GET("/jkxm/listlrsh", v2.GetJkxmByShbz)
+		// 终结监控项目
+		apiv2.POST("/jkxm/zj", v2.ZjJkxm)
+		// 监控项目终结审核
+		apiv2.POST("/jkxm/zjsh", v2.ShJkxm)
+		// 根据终结标志获取对应项目列表
+		apiv2.GET("/jkxm/listzj", v2.GetJkxmByZjbz)
+		// 根据审核标志获取对应项目列表(终结审核)
+		apiv2.GET("/jkxm/listzjsh", v2.GetJkxmByShbz)
+		// 获取所有监控项目异常数量
+		apiv2.GET("/jkxms", v2.GetJkxms)
+
+		// 获取监控项目名称代码
+		apiv2.GET("/jkxm/mcdm", v2.GetJkxmMcdms)
 	}
 	return r
 }

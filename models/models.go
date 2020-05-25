@@ -1,11 +1,11 @@
 package models
 
 import (
+	"NULL/knowledgebase/pkg/setting"
 	"fmt"
 	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
-	"NULL/knowledgebase/pkg/setting"
 	"log"
 )
 
@@ -83,6 +83,57 @@ func CheckTable() {
 	} else {
 		db.AutoMigrate(Kind{})
 	}
+
+	if !db.HasTable("jkxm_mcdm") {
+		db.CreateTable(JkxmMcdm{})
+	} else {
+		db.AutoMigrate(JkxmMcdm{})
+	}
+	if !db.HasTable("jkxm_qs") {
+		db.CreateTable(JkxmQs{})
+	} else {
+		db.AutoMigrate(JkxmQs{})
+	}
+	if !db.HasTable("jkxm_jcwbj") {
+		db.CreateTable(JkxmJcwbj{})
+	} else {
+		db.AutoMigrate(JkxmJcwbj{})
+	}
+	if !db.HasTable("jkxm_pgwbj") {
+		db.CreateTable(JkxmPgwbj{})
+	} else {
+		db.AutoMigrate(JkxmPgwbj{})
+	}
+	if !db.HasTable("jkxm_wjxtdhj") {
+		db.CreateTable(JkxmWjxtdhj{})
+	} else {
+		db.AutoMigrate(JkxmWjxtdhj{})
+	}
+	if !db.HasTable("jkxm_nsxydj") {
+		db.CreateTable(JkxmNsxydj{})
+	} else {
+		db.AutoMigrate(JkxmNsxydj{})
+	}
+	if !db.HasTable("jkxm_fxfpwcl") {
+		db.CreateTable(JkxmFxfpwcl{})
+	} else {
+		db.AutoMigrate(JkxmFxfpwcl{})
+	}
+	if !db.HasTable("jkxm_fc") {
+		db.CreateTable(JkxmFc{})
+	} else {
+		db.AutoMigrate(JkxmFc{})
+	}
+	if !db.HasTable("jkxm_td") {
+		db.CreateTable(JkxmTd{})
+	} else {
+		db.AutoMigrate(JkxmTd{})
+	}
+	if !db.HasTable("jkxm_qt") {
+		db.CreateTable(JkxmQt{})
+	} else {
+		db.AutoMigrate(JkxmQt{})
+	}
 }
 
 func InitDb() {
@@ -99,5 +150,13 @@ func InitDb() {
 			log.Printf("init save InfoCount error: %v", err)
 			return
 		}
+	}
+	err = db.Select("id").Model(&JkxmMcdm{}).Count(&cnt).Error
+	if err != nil && err != gorm.ErrRecordNotFound {
+		log.Printf("init JkxmMcdm error: %v", err)
+		return
+	}
+	if cnt == 0 {
+		InitXmdm()
 	}
 }

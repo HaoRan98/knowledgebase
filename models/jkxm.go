@@ -43,7 +43,7 @@ type JkxmWjxtdhj struct {
 	ID string `json:"id" gorm:"primary_key"`
 	JkxmBase
 	Sbhjbz string `json:"sbhjbz" gorm:"COMMENT:'土地增值税申报汇缴标志'"`
-	Xmmc   string `json:"jcyr" gorm:"COMMENT:'项目名称'"`
+	Xmmc   string `json:"xmmc" gorm:"COMMENT:'项目名称'"`
 }
 
 // 监控项目--纳税信用等级

@@ -6,6 +6,7 @@ import (
 	"mime/multipart"
 	"os"
 	"path"
+	"time"
 )
 
 // GetSize get the file size
@@ -89,4 +90,25 @@ func MustOpen(fileName, filePath string) (*os.File, error) {
 	}
 
 	return f, nil
+}
+
+// Judement file modtime older than overDate
+func IsOlderThanDate(t time.Time, overDate int64) bool {
+	return time.Now().Sub(t) > time.Duration(overDate)*24*time.Hour
+}
+
+// Find files older than overDate
+func FindFilesOlderThanDate(dir string, overDate int) (files []os.FileInfo, err error) {
+	tmpfiles, err := ioutil.ReadDir(dir)
+	if err != nil {
+		return nil, err
+	}
+	for _, file := range tmpfiles {
+		if file.Mode().IsRegular() {
+			if IsOlderThanDate(file.ModTime(), int64(overDate)) {
+				files = append(files, file)
+			}
+		}
+	}
+	return files, nil
 }

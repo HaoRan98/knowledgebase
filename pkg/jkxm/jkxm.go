@@ -23,40 +23,40 @@ func ImpJkxm(fileName io.Reader, xmDm string, userInfo map[string]string) (impMs
 		return
 	}
 	rows := xlsx.GetRows(sheetName)
-	switch sheetName { //选择表名
+	switch sheetName {
 	case "jkxm_qs":
-		erMsg := QsXmlToDB(rows, userInfo, sheetName)
+		erMsg := QsXmlToDB(rows, userInfo)
 		impMsg = append(impMsg, erMsg...)
 	case "jkxm_jcwbj":
-		erMsg := JcwbjXmlToDB(rows, userInfo, sheetName)
+		erMsg := JcwbjXmlToDB(rows, userInfo)
 		impMsg = append(impMsg, erMsg...)
 	case "jkxm_pgwbj":
-		erMsg := PgwbjXmlToDB(rows, userInfo, sheetName)
+		erMsg := PgwbjXmlToDB(rows, userInfo)
 		impMsg = append(impMsg, erMsg...)
 	case "jkxm_wjxtdhj":
-		erMsg := WjxtdhjXmlToDB(rows, userInfo, sheetName)
+		erMsg := WjxtdhjXmlToDB(rows, userInfo)
 		impMsg = append(impMsg, erMsg...)
 	case "jkxm_nsxydj":
-		erMsg := NsxydjXmlToDB(rows, userInfo, sheetName)
+		erMsg := NsxydjXmlToDB(rows, userInfo)
 		impMsg = append(impMsg, erMsg...)
 	case "jkxm_fxfpwcl":
-		erMsg := FxfpwclXmlToDB(rows, userInfo, sheetName)
+		erMsg := FxfpwclXmlToDB(rows, userInfo)
 		impMsg = append(impMsg, erMsg...)
 	case "jkxm_fc":
-		erMsg := FcXmlToDB(rows, userInfo, sheetName)
+		erMsg := FcXmlToDB(rows, userInfo)
 		impMsg = append(impMsg, erMsg...)
 	case "jkxm_td":
-		erMsg := TdXmlToDB(rows, userInfo, sheetName)
+		erMsg := TdXmlToDB(rows, userInfo)
 		impMsg = append(impMsg, erMsg...)
 	case "jkxm_qt":
-		erMsg := QtXmlToDB(rows, userInfo, sheetName)
+		erMsg := QtXmlToDB(rows, userInfo)
 		impMsg = append(impMsg, erMsg...)
 	}
 	return
 }
 
 // 欠税
-func QsXmlToDB(rows [][]string, userInfo map[string]string, sheetName string) (impMsg []string) {
+func QsXmlToDB(rows [][]string, userInfo map[string]string) (impMsg []string) {
 	//遍历行读取
 	for k, row := range rows {
 		// 跳过标题行，遍历每行的列读取
@@ -236,7 +236,7 @@ func QsXmlToDB(rows [][]string, userInfo map[string]string, sheetName string) (i
 }
 
 // 稽查未办结
-func JcwbjXmlToDB(rows [][]string, userInfo map[string]string, sheetName string) (impMsg []string) {
+func JcwbjXmlToDB(rows [][]string, userInfo map[string]string) (impMsg []string) {
 	//遍历行读取
 	for k, row := range rows {
 		// 跳过标题行，遍历每行的列读取
@@ -287,7 +287,7 @@ func JcwbjXmlToDB(rows [][]string, userInfo map[string]string, sheetName string)
 }
 
 // 评估未办结
-func PgwbjXmlToDB(rows [][]string, userInfo map[string]string, sheetName string) (impMsg []string) {
+func PgwbjXmlToDB(rows [][]string, userInfo map[string]string) (impMsg []string) {
 	//遍历行读取
 	for k, row := range rows {
 		// 跳过标题行，遍历每行的列读取
@@ -338,7 +338,7 @@ func PgwbjXmlToDB(rows [][]string, userInfo map[string]string, sheetName string)
 }
 
 // 未进行土增汇缴
-func WjxtdhjXmlToDB(rows [][]string, userInfo map[string]string, sheetName string) (impMsg []string) {
+func WjxtdhjXmlToDB(rows [][]string, userInfo map[string]string) (impMsg []string) {
 	//遍历行读取
 	for k, row := range rows {
 		// 跳过标题行，遍历每行的列读取
@@ -389,7 +389,7 @@ func WjxtdhjXmlToDB(rows [][]string, userInfo map[string]string, sheetName strin
 }
 
 // 纳税信用等级
-func NsxydjXmlToDB(rows [][]string, userInfo map[string]string, sheetName string) (impMsg []string) {
+func NsxydjXmlToDB(rows [][]string, userInfo map[string]string) (impMsg []string) {
 	//遍历行读取
 	for k, row := range rows {
 		// 跳过标题行，遍历每行的列读取
@@ -438,7 +438,7 @@ func NsxydjXmlToDB(rows [][]string, userInfo map[string]string, sheetName string
 }
 
 // 风险发票未处理
-func FxfpwclXmlToDB(rows [][]string, userInfo map[string]string, sheetName string) (impMsg []string) {
+func FxfpwclXmlToDB(rows [][]string, userInfo map[string]string) (impMsg []string) {
 	//遍历行读取
 	for k, row := range rows {
 		// 跳过标题行，遍历每行的列读取
@@ -491,7 +491,7 @@ func FxfpwclXmlToDB(rows [][]string, userInfo map[string]string, sheetName strin
 }
 
 // 房产
-func FcXmlToDB(rows [][]string, userInfo map[string]string, sheetName string) (impMsg []string) {
+func FcXmlToDB(rows [][]string, userInfo map[string]string) (impMsg []string) {
 	//遍历行读取
 	for k, row := range rows {
 		// 跳过标题行，遍历每行的列读取
@@ -542,7 +542,7 @@ func FcXmlToDB(rows [][]string, userInfo map[string]string, sheetName string) (i
 }
 
 // 土地
-func TdXmlToDB(rows [][]string, userInfo map[string]string, sheetName string) (impMsg []string) {
+func TdXmlToDB(rows [][]string, userInfo map[string]string) (impMsg []string) {
 	//遍历行读取
 	for k, row := range rows {
 		// 跳过标题行，遍历每行的列读取
@@ -593,7 +593,7 @@ func TdXmlToDB(rows [][]string, userInfo map[string]string, sheetName string) (i
 }
 
 // 其他
-func QtXmlToDB(rows [][]string, userInfo map[string]string, sheetName string) (impMsg []string) {
+func QtXmlToDB(rows [][]string, userInfo map[string]string) (impMsg []string) {
 	//遍历行读取
 	for k, row := range rows {
 		// 跳过标题行，遍历每行的列读取

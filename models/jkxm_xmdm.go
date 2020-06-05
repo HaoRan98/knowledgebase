@@ -26,6 +26,14 @@ func GetJkxmMcdms() ([]*JkxmMcdm, error) {
 	return mcDms, nil
 }
 
+func GetJkxmMcByDm(dm string) string {
+	var mcDm JkxmMcdm
+	if err := db.First(&mcDm).Error; err != nil {
+		return dm
+	}
+	return mcDm.Mc
+}
+
 func InitXmdm() {
 	inFile := setting.AppSetting.RuntimeRootPath +
 		setting.AppSetting.ExportSavePath + "jkxm_mcdm.xlsx"

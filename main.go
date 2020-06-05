@@ -2,6 +2,7 @@ package main
 
 import (
 	"NULL/knowledgebase/models"
+	"NULL/knowledgebase/pkg/cron"
 	"NULL/knowledgebase/pkg/logging"
 	"NULL/knowledgebase/pkg/setting"
 	"NULL/knowledgebase/pkg/util"
@@ -21,6 +22,7 @@ func init() {
 	logging.Setup()
 	util.Setup()
 	models.Setup()
+	cron.Setup()
 }
 
 func main() {

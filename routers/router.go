@@ -125,6 +125,8 @@ func InitRouter() *gin.Engine {
 		apiv2.GET("/jkxm/listzj", v2.GetJkxmByZjbz)
 		// 根据审核标志获取对应项目列表(终结审核)
 		apiv2.GET("/jkxm/listzjsh", v2.GetJkxmByShbz)
+		// 下载根据审核标志获取对应项目列表(终结审核)
+		apiv2.GET("/jkxm/dlycxx", v2.DownloadJkxmByShbz)
 		// 获取所有监控项目异常数量
 		apiv2.GET("/jkxms", v2.GetJkxms)
 

@@ -4,6 +4,7 @@ import (
 	"NULL/knowledgebase/models"
 	"NULL/knowledgebase/pkg/app"
 	"NULL/knowledgebase/pkg/e"
+	"NULL/knowledgebase/pkg/export"
 	"NULL/knowledgebase/pkg/jkxm"
 	"fmt"
 	"github.com/gin-contrib/sessions"
@@ -17,7 +18,6 @@ import (
 type ShZjForm struct {
 	XmDm string   `json:"xm_dm"`
 	Id   []string `json:"id"`
-	Xh   []string `json:"xh"`
 }
 
 // 导入监控项目
@@ -90,11 +90,10 @@ func ShJkxm(c *gin.Context) {
 		}
 	}
 	var data []string
-	for i, id := range form.Id {
+	for _, id := range form.Id {
 		if err := models.ShJkxm(form.XmDm, id, shMap); err != nil {
 			log.Println(err)
-			data = append(data, fmt.Sprintf(
-				"序号为%s的记录,审核失败!", form.Xh[i]))
+			data = append(data, id)
 			continue
 		}
 	}
@@ -135,11 +134,10 @@ func ZjJkxm(c *gin.Context) {
 		"zjbz":         "Y",
 	}
 	var data []string
-	for i, id := range form.Id {
+	for _, id := range form.Id {
 		if err := models.ZjJkxm(form.XmDm, id, zjMap); err != nil {
 			log.Println(err)
-			data = append(data, fmt.Sprintf(
-				"序号为%s的记录,终结失败!", form.Xh[i]))
+			data = append(data, id)
 			continue
 		}
 	}
@@ -154,15 +152,22 @@ func GetJkxmByShbz(c *gin.Context) {
 	var (
 		appG   = app.Gin{C: c}
 		nsrsbh = c.Query("nsrsbh")
+		xmDm   = c.Query("xm_dm")
+		shbz   = c.Query("shbz")
 		squery string
 	)
 	if strings.Contains(c.Request.URL.Path, "lrsh") {
-		squery = fmt.Sprintf(`select * from %s where shbz='%s'`,
-			c.Query("xm_dm"), c.Query("shbz"))
+		squery = fmt.Sprintf(
+			`select * from %s where shbz='%s'`, xmDm, shbz)
 	}
 	if strings.Contains(c.Request.URL.Path, "zjsh") {
-		squery = fmt.Sprintf(`select * from %s where zjshbz='%s' and zjbz='Y'`,
-			c.Query("xm_dm"), c.Query("shbz"))
+		if c.Query("flag") == "" {
+			squery = fmt.Sprintf(
+				`select * from %s where zjshbz='%s' and zjbz='Y'`, xmDm, shbz)
+		} else {
+			squery = fmt.Sprintf(
+				`select * from %s where zjshbz='N' and shbz='Y'`, xmDm)
+		}
 	}
 	if nsrsbh != "" {
 		squery += fmt.Sprintf(" and nsrsbh='%s'", nsrsbh)
@@ -173,6 +178,36 @@ func GetJkxmByShbz(c *gin.Context) {
 		return
 	}
 	appG.Response(http.StatusOK, e.SUCCESS, data)
+}
+
+// 下载根据审核标志获取对应项目列表
+func DownloadJkxmByShbz(c *gin.Context) {
+	var (
+		appG   = app.Gin{C: c}
+		nsrsbh = c.Query("nsrsbh")
+		xmDm   = c.Query("xm_dm")
+		shbz   = c.Query("shbz")
+	)
+	squery := fmt.Sprintf(
+		`select * from %s where zjshbz='%s' and shbz='Y'`, xmDm, shbz)
+	if nsrsbh != "" {
+		squery += fmt.Sprintf(" and nsrsbh='%s'", nsrsbh)
+	}
+	records, err := models.QueryData(squery)
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR, err.Error())
+		return
+	}
+	var url = "该监控项目没有异常数据"
+	if len(records) > 0 {
+		fileName := models.GetJkxmMcByDm(xmDm)
+		url, err = export.WriteIntoExcel(fileName, records)
+		if err != nil {
+			appG.Response(http.StatusInternalServerError, e.ERROR, err.Error())
+			return
+		}
+	}
+	appG.Response(http.StatusOK, e.SUCCESS, url)
 }
 
 // 根据终结标志获取对应项目列表
@@ -214,7 +249,9 @@ func GetJkxms(c *gin.Context) {
 			if nsrsbh != "" {
 				cond = fmt.Sprintf("nsrsbh='%s'", nsrsbh)
 				if nsrmc == "" {
-					query := fmt.Sprintf(`select distinct nsrmc from %s`, mcdm.Dm)
+					query := fmt.Sprintf(
+						`select distinct nsrmc from %s where nsrsbh='%s'`,
+						mcdm.Dm, nsrsbh)
 					nsrmcs, _ := models.QueryData(query)
 					if len(nsrmcs) > 0 {
 						nsrmc = nsrmcs[0]["nsrmc"]
@@ -225,7 +262,6 @@ func GetJkxms(c *gin.Context) {
 				nsrmc = "合计"
 			}
 			cnt := models.CountJkxms(mcdm.Dm, cond)
-
 			resps = append(resps, &Resp{mcdm, cnt})
 		}
 	}

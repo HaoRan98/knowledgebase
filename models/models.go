@@ -114,6 +114,11 @@ func CheckTable() {
 	} else {
 		db.AutoMigrate(JkxmNsxydj{})
 	}
+	if !db.HasTable("jkxm_cktsba") {
+		db.CreateTable(JkxmCktsba{})
+	} else {
+		db.AutoMigrate(JkxmCktsba{})
+	}
 	if !db.HasTable("jkxm_fxfpwcl") {
 		db.CreateTable(JkxmFxfpwcl{})
 	} else {
@@ -133,6 +138,11 @@ func CheckTable() {
 		db.CreateTable(JkxmQt{})
 	} else {
 		db.AutoMigrate(JkxmQt{})
+	}
+	if !db.HasTable("jkxm_jbzx") {
+		db.CreateTable(JkxmJbzx{})
+	} else {
+		db.AutoMigrate(JkxmJbzx{})
 	}
 }
 

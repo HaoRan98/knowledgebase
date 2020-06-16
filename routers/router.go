@@ -127,8 +127,29 @@ func InitRouter() *gin.Engine {
 		apiv2.GET("/jkxm/listzjsh", v2.GetJkxmByShbz)
 		// 下载根据审核标志获取对应项目列表(终结审核)
 		apiv2.GET("/jkxm/dlycxx", v2.DownloadJkxmByShbz)
-		// 获取所有监控项目异常数量
-		apiv2.GET("/jkxms", v2.GetJkxms)
+
+		// 即办注销监控项目
+		apiv2.POST("/jkxm/jbzx", v2.JbzxJkxm)
+		// 统计工作量
+		apiv2.GET("/jkxm/workload", v2.CountWorkload)
+		// 获取所有监控项目异常总数量
+		apiv2.GET("/jkxms/total", v2.GetJkxmsTotal)
+		// 获取所有监控项目异常(已经解除疑点)数量
+		apiv2.GET("/jkxms/resolve", v2.GetJkxmsResolve)
+		// 获取所有监控项目异常(未终结审核)数量/尚未解除的疑点数量
+		apiv2.GET("/jkxms/unsolved", v2.GetJkxmsUnsolved)
+		// 成果统计
+		apiv2.GET("/jkxm/zxtj", v2.Zxtj)
+		// 确认启动即办注销流程户数明细
+		apiv2.GET("/jkxm/jbzxmx", v2.JbzxJkxmMx)
+		// 金三即办注销户数明细
+		apiv2.GET("/jkxm/gt3mx", v2.JbzxGT3Mx)
+		// 注销运行情况监控
+		apiv2.GET("/jkxm/zxqkjk", v2.Zxqkjk)
+		// 下载确认启动即办注销流程名单
+		apiv2.GET("/jkxm/dljbzxmx", v2.DownloadJbzxJkxmMx)
+		// 下载注销运行情况监控名单
+		apiv2.GET("/jkxm/dlzxqkjk", v2.DownloadZxqkjk)
 
 		// 获取监控项目名称代码
 		apiv2.GET("/jkxm/mcdm", v2.GetJkxmMcdms)

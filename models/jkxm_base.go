@@ -56,7 +56,25 @@ func ZjJkxm(tName, id string, zjMap map[string]string) error {
 	return nil
 }
 
-func CountJkxms(tName, cond string) int {
+func CountJkxmsToal(tName, cond string) int {
+	var cnt int
+	if err := db.Table(tName).
+		Where(cond).Where("shbz='Y'").Count(&cnt).Error; err != nil {
+		return 0
+	}
+	return cnt
+}
+
+func CountJkxmRsolved(tName, cond string) int {
+	var cnt int
+	if err := db.Table(tName).
+		Where(cond).Where("zjshbz='Y'").Count(&cnt).Error; err != nil {
+		return 0
+	}
+	return cnt
+}
+
+func CountJkxmsUnsolved(tName, cond string) int {
 	var cnt int
 	if err := db.Table(tName).
 		Where(cond).Where("shbz='Y' and zjshbz='N'").Count(&cnt).Error; err != nil {
@@ -96,12 +114,14 @@ func QueryData(squery string) ([]map[string]string, error) {
 	return results, nil
 }
 
-func SortFields(tHeader map[string]string) []string {
+func SortJkxmFields(tHeader map[string]string) []string {
 	sorted_keys, tempMap := make([]string, 12), make([]string, 10)
 	for filed := range tHeader {
+		filed = strings.ToLower(filed)
 		if filed == "id" ||
 			strings.Contains(filed, "_account") ||
 			strings.Contains(filed, "_depid") ||
+			strings.Contains(filed, "shbz") ||
 			strings.Contains(filed, "zjbz") ||
 			strings.Contains(filed, "zjshr_name") ||
 			strings.Contains(filed, "zjshr_deptname") ||
@@ -165,6 +185,8 @@ func ReplaceTableFileds(field string) string {
 		field = "审核人部门"
 	case "shrq":
 		field = "审核日期"
+	case "shbz":
+		field = "审核标志"
 
 	case "zjr_name":
 		field = "终结人"
@@ -246,6 +268,18 @@ func ReplaceTableFileds(field string) string {
 
 	case "qtxzxx":
 		field = "其他限制信息"
+
+	case "jbr_name":
+		field = "经办人"
+	case "jbr_deptname":
+		field = "经办人部门"
+	case "qrrq":
+		field = "确认日期"
+
+	case "zxry":
+		field = "注销人员"
+	case "zxsj":
+		field = "金三注销时间"
 
 	default:
 		field = field

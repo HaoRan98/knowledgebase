@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -180,7 +181,7 @@ func GetJkxmByShbz(c *gin.Context) {
 	appG.Response(http.StatusOK, e.SUCCESS, data)
 }
 
-// 下载根据审核标志获取对应项目列表
+// 下载根据终结审核标志获取对应项目列表
 func DownloadJkxmByShbz(c *gin.Context) {
 	var (
 		appG   = app.Gin{C: c}
@@ -189,7 +190,10 @@ func DownloadJkxmByShbz(c *gin.Context) {
 		shbz   = c.Query("shbz")
 	)
 	squery := fmt.Sprintf(
-		`select * from %s where zjshbz='%s' and shbz='Y'`, xmDm, shbz)
+		`select * from %s where shbz='Y'`, xmDm)
+	if shbz != "" {
+		squery += fmt.Sprintf(" and zjshbz='%s'", shbz)
+	}
 	if nsrsbh != "" {
 		squery += fmt.Sprintf(" and nsrsbh='%s'", nsrsbh)
 	}
@@ -200,7 +204,7 @@ func DownloadJkxmByShbz(c *gin.Context) {
 	}
 	var url = "该监控项目没有异常数据"
 	if len(records) > 0 {
-		fileName := models.GetJkxmMcByDm(xmDm)
+		fileName := models.GetJkxmMcByDm(xmDm) + strconv.Itoa(int(time.Now().Unix()))
 		url, err = export.WriteIntoExcel(fileName, records)
 		if err != nil {
 			appG.Response(http.StatusInternalServerError, e.ERROR, err.Error())
@@ -223,52 +227,6 @@ func GetJkxmByZjbz(c *gin.Context) {
 	if err != nil {
 		appG.Response(http.StatusInternalServerError, e.ERROR, err.Error())
 		return
-	}
-	appG.Response(http.StatusOK, e.SUCCESS, data)
-}
-
-type Resp struct {
-	*models.JkxmMcdm
-	Cnt int `json:"cnt"`
-}
-
-// 获取所有监控项目异常(未终结审核)数量
-func GetJkxms(c *gin.Context) {
-	appG := app.Gin{C: c}
-	nsrsbh := c.Query("nsrsbh")
-	mcdms, err := models.GetJkxmMcdms()
-	if err != nil {
-		appG.Response(http.StatusInternalServerError, e.ERROR, err.Error())
-		return
-	}
-	var nsrmc string
-	var resps = make([]*Resp, 0)
-	if len(mcdms) > 0 {
-		for _, mcdm := range mcdms {
-			var cond string
-			if nsrsbh != "" {
-				cond = fmt.Sprintf("nsrsbh='%s'", nsrsbh)
-				if nsrmc == "" {
-					query := fmt.Sprintf(
-						`select distinct nsrmc from %s where nsrsbh='%s'`,
-						mcdm.Dm, nsrsbh)
-					nsrmcs, _ := models.QueryData(query)
-					if len(nsrmcs) > 0 {
-						nsrmc = nsrmcs[0]["nsrmc"]
-					}
-				}
-			} else {
-				cond = "nsrsbh like '%'"
-				nsrmc = "合计"
-			}
-			cnt := models.CountJkxms(mcdm.Dm, cond)
-			resps = append(resps, &Resp{mcdm, cnt})
-		}
-	}
-	data := map[string]interface{}{
-		"nsrshb": nsrsbh,
-		"nsrmc":  nsrmc,
-		"list":   resps,
 	}
 	appG.Response(http.StatusOK, e.SUCCESS, data)
 }

@@ -34,7 +34,12 @@ func WriteIntoExcel(fileName string, records []map[string]string) (string, error
 	xlsx := excelize.NewFile()
 	index := xlsx.NewSheet(sheetName)
 	// sort map key
-	sorted_keys := models.SortFields(records[0])
+	var sorted_keys []string
+	if strings.Contains(fileName, "名单") {
+		sorted_keys = models.SortFields(records[0])
+	} else { //jkxm export
+		sorted_keys = models.SortJkxmFields(records[0])
+	}
 	/*
 		sorted_keys := make([]string, 0)
 		for filed := range records[0] {

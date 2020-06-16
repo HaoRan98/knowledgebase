@@ -39,6 +39,9 @@ func ImpJkxm(fileName io.Reader, xmDm string, userInfo map[string]string) (impMs
 	case "jkxm_nsxydj":
 		erMsg := NsxydjXmlToDB(rows, userInfo)
 		impMsg = append(impMsg, erMsg...)
+	case "jkxm_cktsba":
+		erMsg := CktsbaXmlToDB(rows, userInfo)
+		impMsg = append(impMsg, erMsg...)
 	case "jkxm_fxfpwcl":
 		erMsg := FxfpwclXmlToDB(rows, userInfo)
 		impMsg = append(impMsg, erMsg...)
@@ -425,6 +428,53 @@ func NsxydjXmlToDB(rows [][]string, userInfo map[string]string) (impMsg []string
 			continue
 		}
 		err := models.AddJkxmData("jkxm_nsxydj", &xm)
+		if err != nil {
+			impMsg = append(impMsg, fmt.Sprintf("第%d行导入错误:%s", k+1, err.Error()))
+		}
+	}
+	if len(impMsg) > 0 {
+		impMsg = append(impMsg, "除上述记录外导入成功!")
+	} else {
+		impMsg = append(impMsg, fmt.Sprintf("导入成功,共导入%d条!", len(rows)-1))
+	}
+	return
+}
+
+// 出口退（免）税备案
+func CktsbaXmlToDB(rows [][]string, userInfo map[string]string) (impMsg []string) {
+	//遍历行读取
+	for k, row := range rows {
+		// 跳过标题行，遍历每行的列读取
+		if k == 0 {
+			continue
+		}
+		erMsg := make([]string, 0)
+		xm := models.JkxmCktsba{}
+		xm.ID = "CKTSBA-" + util.RandomString(13)
+		xm.FqrAccount = userInfo["userAccount"]
+		xm.FqrName = userInfo["username"]
+		xm.FqrDepid = userInfo["departID"]
+		xm.FqrDeptname = userInfo["departName"]
+		xm.Fqrq = time.Now().Format("2006-01-02 15:04:05")
+		for i, cell := range row {
+			if cell == "" {
+				erMsg = append(erMsg, fmt.Sprintf(
+					"第%d行导入错误:第%d列存在未录入项！", k+1, i+1))
+				continue
+			}
+			switch {
+			case i == 0:
+				xm.Nsrsbh = cell
+			case i == 1:
+				xm.Nsrmc = cell
+			}
+		}
+		//logging.Debug(fmt.Sprintf("出口退（免）税备案: %+v", &xm))
+		if len(erMsg) > 0 {
+			impMsg = append(impMsg, erMsg...)
+			continue
+		}
+		err := models.AddJkxmData("jkxm_cktsba", &xm)
 		if err != nil {
 			impMsg = append(impMsg, fmt.Sprintf("第%d行导入错误:%s", k+1, err.Error()))
 		}

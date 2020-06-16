@@ -52,6 +52,11 @@ type JkxmNsxydj struct {
 	JkxmBase
 	Nsxydj string `json:"nsxydj" gorm:"COMMENT:'纳税信用等级为D';default:'N'"`
 }
+// 监控项目--出口退（免）税备案
+type JkxmCktsba struct {
+	ID string `json:"id" gorm:"primary_key"`
+	JkxmBase
+}
 
 // 监控项目--风险发票未处理
 type JkxmFxfpwcl struct {

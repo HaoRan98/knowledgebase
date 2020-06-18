@@ -148,6 +148,8 @@ func InitRouter() *gin.Engine {
 		apiv2.GET("/jkxm/zxqkjk", v2.Zxqkjk)
 		// 下载确认启动即办注销流程名单
 		apiv2.GET("/jkxm/dljbzxmx", v2.DownloadJbzxJkxmMx)
+		// 下载金三即办注销流程名单
+		apiv2.GET("/jkxm/dlgt3mx", v2.DownloadGT3Mx)
 		// 下载注销运行情况监控名单
 		apiv2.GET("/jkxm/dlzxqkjk", v2.DownloadZxqkjk)
 

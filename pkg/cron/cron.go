@@ -1,8 +1,10 @@
 package cron
 
 import (
+	"NULL/knowledgebase/models"
 	"NULL/knowledgebase/pkg/export"
 	"NULL/knowledgebase/pkg/file"
+	"NULL/knowledgebase/pkg/jkxm"
 	"github.com/robfig/cron"
 	"log"
 	"os"
@@ -16,6 +18,10 @@ func Setup() {
 		// 每天1点清理超过1天的导出记录
 		if err := c.AddFunc("0 0 1 * * *", CleanUpExportFiles); err != nil {
 			log.Printf("WriteIntoFile crontab failed：%v", err)
+		}
+		// 每天2点同步开发区数据中台指标
+		if err := c.AddFunc("0 0 2 * * *", SyncJkxm); err != nil {
+			log.Printf("SyncJkxm crontab failed：%v", err)
 		}
 		c.Run()
 	}()
@@ -42,3 +48,10 @@ func CleanUpExportFiles() {
 }
 
 //定时同步开发区数据中台指标
+func SyncJkxm() {
+	ldDate := models.NewLdDate("")
+	jkxm.SyncJkxmQs(ldDate)
+	jkxm.SyncJkxmCktsba()
+	//jkxm.SyncJkxmPgwbj(ldDate)
+	//jkxm.SyncJkxmNsxydj(ldDate)
+}

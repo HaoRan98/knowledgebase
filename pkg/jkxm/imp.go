@@ -6,11 +6,10 @@ import (
 	"fmt"
 	"github.com/360EntSecGroup-Skylar/excelize"
 	"io"
-	"strconv"
 	"time"
 )
 
-// 导入监控项目数据
+// ----------------------------导入监控项目数据----------------------------
 func ImpJkxm(fileName io.Reader, xmDm string, userInfo map[string]string) (impMsg []string) {
 	xlsx, err := excelize.OpenReader(fileName)
 	if err != nil {
@@ -91,133 +90,53 @@ func QsXmlToDB(rows [][]string, userInfo map[string]string) (impMsg []string) {
 			case i == 1:
 				xm.Nsrmc = cell
 			case i == 2:
-				numFormat, err := strconv.ParseFloat(cell, 64)
-				if err != nil {
-					erMsg = append(erMsg, fmt.Sprintf(
-						"第%d行导入错误:第%d列增值税金额有误！", k+1, i+1))
-				} else {
-					xm.Zzs = numFormat
-				}
+				xm.Zzs = cell
 			case i == 3:
-				numFormat, err := strconv.ParseFloat(cell, 64)
-				if err != nil {
-					erMsg = append(erMsg, fmt.Sprintf(
-						"第%d行导入错误:第%d列消费税金额有误！", k+1, i+1))
-				} else {
-					xm.Xfs = numFormat
-				}
+				xm.Xfs = cell
 			case i == 4:
-				numFormat, err := strconv.ParseFloat(cell, 64)
-				if err != nil {
-					erMsg = append(erMsg, fmt.Sprintf(
-						"第%d行导入错误:第%d列企业所得税金额有误！", k+1, i+1))
-				} else {
-					xm.Qysds = numFormat
-				}
+				xm.Qysds = cell
 			case i == 5:
-				numFormat, err := strconv.ParseFloat(cell, 64)
-				if err != nil {
-					erMsg = append(erMsg, fmt.Sprintf(
-						"第%d行导入错误:第%d列个人所得税金额有误！", k+1, i+1))
-				} else {
-					xm.Grsds = numFormat
-				}
+				xm.Grsds = cell
 			case i == 6:
-				numFormat, err := strconv.ParseFloat(cell, 64)
-				if err != nil {
-					erMsg = append(erMsg, fmt.Sprintf(
-						"第%d行导入错误:第%d列土地增值税金额有误！", k+1, i+1))
-				} else {
-					xm.Tdzzs = numFormat
-				}
+				xm.Tdzzs = cell
 			case i == 7:
-				numFormat, err := strconv.ParseFloat(cell, 64)
-				if err != nil {
-					erMsg = append(erMsg, fmt.Sprintf(
-						"第%d行导入错误:第%d列营业税金额有误！", k+1, i+1))
-				} else {
-					xm.Yys = numFormat
-				}
+				xm.Yys = cell
 			case i == 8:
-				numFormat, err := strconv.ParseFloat(cell, 64)
-				if err != nil {
-					erMsg = append(erMsg, fmt.Sprintf(
-						"第%d行%d列导入错误:资源税金额有误！", k+1, i+1))
-				} else {
-					xm.Zys = numFormat
-				}
+				xm.Zys = cell
 			case i == 9:
-				numFormat, err := strconv.ParseFloat(cell, 64)
-				if err != nil {
-					erMsg = append(erMsg, fmt.Sprintf(
-						"第%d行导入错误:第%d列房产税金额有误！", k+1, i+1))
-				} else {
-					xm.Fcs = numFormat
-				}
+				xm.Fcs = cell
 			case i == 10:
-				numFormat, err := strconv.ParseFloat(cell, 64)
-				if err != nil {
-					erMsg = append(erMsg, fmt.Sprintf(
-						"第%d行导入错误:第%d列印花税金额有误！", k+1, i+1))
-				} else {
-					xm.Yhs = numFormat
-				}
+				xm.Yhs = cell
 			case i == 11:
-				numFormat, err := strconv.ParseFloat(cell, 64)
-				if err != nil {
-					erMsg = append(erMsg, fmt.Sprintf(
-						"第%d行导入错误:第%d列环境保护税金额有误！", k+1, i+1))
-				} else {
-					xm.Hjbhs = numFormat
-				}
+				xm.Hjbhs = cell
 			case i == 12:
-				numFormat, err := strconv.ParseFloat(cell, 64)
-				if err != nil {
-					erMsg = append(erMsg, fmt.Sprintf(
-						"第%d行导入错误:第%d列车船税金额有误！", k+1, i+1))
-				} else {
-					xm.Ccs = numFormat
-				}
+				xm.Ccs = cell
 			case i == 13:
-				numFormat, err := strconv.ParseFloat(cell, 64)
-				if err != nil {
-					erMsg = append(erMsg, fmt.Sprintf(
-						"第%d行导入错误:第%d列城市维护建设税金额有误！", k+1, i+1))
-				} else {
-					xm.Cswhjss = numFormat
-				}
+				xm.Cswhjss = cell
 			case i == 14:
-				numFormat, err := strconv.ParseFloat(cell, 64)
-				if err != nil {
-					erMsg = append(erMsg, fmt.Sprintf(
-						"第%d行导入错误:第%d列城镇土地使用税金额有误！", k+1, i+1))
-				} else {
-					xm.Cztdsys = numFormat
-				}
+				xm.Cztdsys = cell
 			case i == 15:
-				numFormat, err := strconv.ParseFloat(cell, 64)
-				if err != nil {
-					erMsg = append(erMsg, fmt.Sprintf(
-						"第%d行导入错误:第%d列耕地占用税金额有误！", k+1, i+1))
-				} else {
-					xm.Gdzys = numFormat
-				}
+				xm.Gdzys = cell
 			case i == 16:
-				numFormat, err := strconv.ParseFloat(cell, 64)
-				if err != nil {
-					erMsg = append(erMsg, fmt.Sprintf(
-						"第%d行导入错误:第%d列契税金额有误！", k+1, i+1))
-				} else {
-					xm.Qs = numFormat
-				}
+				xm.Qs = cell
+			case i == 17:
+				xm.Qtsssr = cell
 			case i == 18:
-				numFormat, err := strconv.ParseFloat(cell, 64)
-				if err != nil {
-					erMsg = append(erMsg, fmt.Sprintf(
-						"第%d行导入错误:第%d列其他税收收入金额有误！", k+1, i+1))
-				} else {
-					xm.Qtsssr = numFormat
-				}
+				xm.Clgzs = cell
+			case i == 19:
+				xm.Whsyjsf = cell
+			case i == 20:
+				xm.Sljszxsr = cell
+			case i == 21:
+				xm.Cjrjybzj = cell
+			case i == 22:
+				xm.Dfjyfj = cell
+			case i == 23:
+				xm.Swbmfmsr = cell
+			case i == 24:
+				xm.Jyffj = cell
+			case i == 25:
+				xm.Qtsr = cell
 			}
 		}
 		//logging.Debug(fmt.Sprintf("欠税: %+v", &xm))

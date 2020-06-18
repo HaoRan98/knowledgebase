@@ -277,7 +277,8 @@ func Zxtj(c *gin.Context) {
 		rqz  = c.Query("rqz")
 	)
 	if rqq == "" && rqz == "" {
-		rqq, rqz = "2020-01-01", "2099-12-31"
+		ldDate := models.NewLdDate("")
+		rqq, rqz = ldDate.LdQrqBn, ldDate.LdCurrentDate
 	}
 	var cond = fmt.Sprintf(
 		"qrrq>='%s 00:00:00' and qrrq<='%s 23:59:59'", rqq, rqz)
@@ -286,8 +287,16 @@ func Zxtj(c *gin.Context) {
 		appG.Response(http.StatusInternalServerError, e.ERROR, err.Error())
 		return
 	}
-	//todo
-	sql := `select * from jkxm_gt3`
+	//sql := fmt.Sprintf(
+	//	"select * from jkxm_gt3 where zxsj>='%s 00:00:00' and zxsj<='%s 23:59:59'",
+	//	rqq, rqz)
+	pd, err := models.GetConfigSql("注销")
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR,
+			fmt.Sprintf("获取金三注销名单查询语句失败:%v", err))
+		return
+	}
+	sql := fmt.Sprintf(pd.XmSql, rqq, rqz)
 	gt3Zxs, err := models.QueryData(sql)
 	if err != nil {
 		appG.Response(http.StatusInternalServerError, e.ERROR, err.Error())
@@ -309,7 +318,8 @@ func JbzxJkxmMx(c *gin.Context) {
 		rqz  = c.Query("rqz")
 	)
 	if rqq == "" && rqz == "" {
-		rqq, rqz = "2020-01-01", "2099-12-31"
+		ldDate := models.NewLdDate("")
+		rqq, rqz = ldDate.LdQrqBn, ldDate.LdCurrentDate
 	}
 	var cond = fmt.Sprintf(
 		"qrrq>='%s 00:00:00' and qrrq<='%s 23:59:59'", rqq, rqz)
@@ -327,9 +337,25 @@ func JbzxJkxmMx(c *gin.Context) {
 
 // 金三即办注销户数明细
 func JbzxGT3Mx(c *gin.Context) {
-	appG := app.Gin{C: c}
-	//todo
-	sql := `select NSRSBH,NSRMC,ZXRY,ZXSJ from jkxm_gt3`
+	var (
+		appG = app.Gin{C: c}
+		rqq  = c.Query("rqq")
+		rqz  = c.Query("rqz")
+	)
+	if rqq == "" && rqz == "" {
+		ldDate := models.NewLdDate("")
+		rqq, rqz = ldDate.LdQrqBn, ldDate.LdCurrentDate
+	}
+	//sql := fmt.Sprintf(
+	//	"select * from jkxm_gt3 where zxsj>='%s 00:00:00' and zxsj<='%s 23:59:59'",
+	//	rqq, rqz)
+	pd, err := models.GetConfigSql("注销")
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR,
+			fmt.Sprintf("获取金三注销名单查询语句失败:%v", err))
+		return
+	}
+	sql := fmt.Sprintf(pd.XmSql, rqq, rqz)
 	gt3Zxs, err := models.QueryData(sql)
 	if err != nil {
 		appG.Response(http.StatusInternalServerError, e.ERROR, err.Error())
@@ -338,11 +364,12 @@ func JbzxGT3Mx(c *gin.Context) {
 	if len(gt3Zxs) > 0 {
 		var data = make([]*models.JkxmGt3, len(gt3Zxs))
 		for i, gt3Zx := range gt3Zxs {
+			t, _ := time.Parse(time.RFC3339, gt3Zx["ZXSJ"])
 			data[i] = &models.JkxmGt3{
 				Nsrsbh: gt3Zx["NSRSBH"],
 				Nsrmc:  gt3Zx["NSRMC"],
 				Zxry:   gt3Zx["ZXRY"],
-				Zxsj:   gt3Zx["ZXSJ"],
+				Zxsj:   t.Format("2006-01-02"),
 			}
 		}
 		appG.Response(http.StatusOK, e.SUCCESS, data)
@@ -359,7 +386,8 @@ func Zxqkjk(c *gin.Context) {
 		rqz  = c.Query("rqz")
 	)
 	if rqq == "" && rqz == "" {
-		rqq, rqz = "2020-01-01", "2099-12-31"
+		ldDate := models.NewLdDate("")
+		rqq, rqz = ldDate.LdQrqBn, ldDate.LdCurrentDate
 	}
 	var cond = fmt.Sprintf(
 		"qrrq>='%s 00:00:00' and qrrq<='%s 23:59:59'", rqq, rqz)
@@ -368,8 +396,16 @@ func Zxqkjk(c *gin.Context) {
 		appG.Response(http.StatusInternalServerError, e.ERROR, err.Error())
 		return
 	}
-	//todo
-	sql := `select * from jkxm_gt3`
+	//sql := fmt.Sprintf(
+	//	"select * from jkxm_gt3 where zxsj>='%s 00:00:00' and zxsj<='%s 23:59:59'",
+	//	rqq, rqz)
+	pd, err := models.GetConfigSql("注销")
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR,
+			fmt.Sprintf("获取金三注销名单查询语句失败:%v", err))
+		return
+	}
+	sql := fmt.Sprintf(pd.XmSql, rqq, rqz)
 	gt3Zxs, err := models.QueryData(sql)
 	if err != nil {
 		appG.Response(http.StatusInternalServerError, e.ERROR, err.Error())
@@ -389,11 +425,12 @@ func Zxqkjk(c *gin.Context) {
 			if flag {
 				continue
 			} else {
+				t, _ := time.Parse(time.RFC3339, gt3Zx["ZXSJ"])
 				data = append(data, &models.JkxmGt3{
 					Nsrsbh: gt3Zx["NSRSBH"],
 					Nsrmc:  gt3Zx["NSRMC"],
 					Zxry:   gt3Zx["ZXRY"],
-					Zxsj:   gt3Zx["ZXSJ"],
+					Zxsj:   t.Format("2006-01-02"),
 				})
 			}
 		}
@@ -413,9 +450,12 @@ func DownloadJbzxJkxmMx(c *gin.Context) {
 		rqz  = c.Query("rqz")
 	)
 	if rqq == "" && rqz == "" {
-		rqq, rqz = "2020-01-01", "2099-12-31"
+		ldDate := models.NewLdDate("")
+		rqq, rqz = ldDate.LdQrqBn, ldDate.LdCurrentDate
 	}
-	sql := `select * from jkxm_jbzx`
+	sql := fmt.Sprintf(
+		"select * from jkxm_jbzx where qrrq>='%s 00:00:00' and qrrq<='%s 23:59:59'",
+		rqq, rqz)
 	records, err := models.QueryData(sql)
 	if err != nil {
 		appG.Response(http.StatusInternalServerError, e.ERROR, err.Error())
@@ -433,6 +473,54 @@ func DownloadJbzxJkxmMx(c *gin.Context) {
 	appG.Response(http.StatusOK, e.SUCCESS, url)
 }
 
+// 下载金三即办注销流程名单
+func DownloadGT3Mx(c *gin.Context) {
+	var (
+		appG = app.Gin{C: c}
+		rqq  = c.Query("rqq")
+		rqz  = c.Query("rqz")
+	)
+	if rqq == "" && rqz == "" {
+		ldDate := models.NewLdDate("")
+		rqq, rqz = ldDate.LdQrqBn, ldDate.LdCurrentDate
+	}
+	//sql := fmt.Sprintf(
+	//	"select * from jkxm_gt3 where zxsj>='%s 00:00:00' and zxsj<='%s 23:59:59'",
+	//	rqq, rqz)
+	pd, err := models.GetConfigSql("注销")
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR,
+			fmt.Sprintf("获取金三注销名单查询语句失败:%v", err))
+		return
+	}
+	sql := fmt.Sprintf(pd.XmSql, rqq, rqz)
+	gt3Zxs, err := models.QueryData(sql)
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR, err.Error())
+		return
+	}
+	var url = "金三即办注销流程名单为空"
+	if len(gt3Zxs) > 0 {
+		var records = make([]map[string]string, 0)
+		for _, gt3Zx := range gt3Zxs {
+			t, _ := time.Parse(time.RFC3339, gt3Zx["ZXSJ"])
+			records = append(records, map[string]string{
+				"nsrsbh": gt3Zx["NSRSBH"],
+				"nsrmc":  gt3Zx["NSRMC"],
+				"zxry":   gt3Zx["ZXRY"],
+				"zxsj":   t.Format("2006-01-02"),
+			})
+		}
+		fileName := "金三即办注销流程名单" + strconv.Itoa(int(time.Now().Unix()))
+		url, err = export.WriteIntoExcel(fileName, records)
+		if err != nil {
+			appG.Response(http.StatusInternalServerError, e.ERROR, err.Error())
+			return
+		}
+	}
+	appG.Response(http.StatusOK, e.SUCCESS, url)
+}
+
 // 下载注销运行情况监控名单
 func DownloadZxqkjk(c *gin.Context) {
 	var (
@@ -441,7 +529,8 @@ func DownloadZxqkjk(c *gin.Context) {
 		rqz  = c.Query("rqz")
 	)
 	if rqq == "" && rqz == "" {
-		rqq, rqz = "2020-01-01", "2099-12-31"
+		ldDate := models.NewLdDate("")
+		rqq, rqz = ldDate.LdQrqBn, ldDate.LdCurrentDate
 	}
 	var cond = fmt.Sprintf(
 		"qrrq>='%s 00:00:00' and qrrq<='%s 23:59:59'", rqq, rqz)
@@ -450,8 +539,16 @@ func DownloadZxqkjk(c *gin.Context) {
 		appG.Response(http.StatusInternalServerError, e.ERROR, err.Error())
 		return
 	}
-	//todo
-	sql := `select * from jkxm_gt3`
+	//sql := fmt.Sprintf(
+	//	"select * from jkxm_gt3 where zxsj>='%s 00:00:00' and zxsj<='%s 23:59:59'",
+	//	rqq, rqz)
+	pd, err := models.GetConfigSql("注销")
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR,
+			fmt.Sprintf("获取金三注销名单查询语句失败:%v", err))
+		return
+	}
+	sql := fmt.Sprintf(pd.XmSql, rqq, rqz)
 	gt3Zxs, err := models.QueryData(sql)
 	if err != nil {
 		appG.Response(http.StatusInternalServerError, e.ERROR, err.Error())
@@ -471,7 +568,13 @@ func DownloadZxqkjk(c *gin.Context) {
 			if flag {
 				continue
 			} else {
-				records = append(records, gt3Zx)
+				t, _ := time.Parse(time.RFC3339, gt3Zx["ZXSJ"])
+				records = append(records, map[string]string{
+					"nsrsbh": gt3Zx["NSRSBH"],
+					"nsrmc":  gt3Zx["NSRMC"],
+					"zxry":   gt3Zx["ZXRY"],
+					"zxsj":   t.Format("2006-01-02"),
+				})
 			}
 		}
 	}

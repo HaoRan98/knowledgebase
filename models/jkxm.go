@@ -4,22 +4,30 @@ package models
 type JkxmQs struct {
 	ID string `json:"id" gorm:"primary_key"`
 	JkxmBase
-	Zzs     float64 `json:"zzs" gorm:"COMMENT:'增值税';default:0.00"`
-	Xfs     float64 `json:"xfs" gorm:"COMMENT:'消费税';default:0.00"`
-	Qysds   float64 `json:"qysds" gorm:"COMMENT:'企业所得税';default:0.00"`
-	Grsds   float64 `json:"grsds" gorm:"COMMENT:'个人所得税';default:0.00"`
-	Tdzzs   float64 `json:"tdzzs" gorm:"COMMENT:'土地增值税';default:0.00"`
-	Yys     float64 `json:"yys" gorm:"COMMENT:'营业税';default:0.00"`
-	Zys     float64 `json:"zys" gorm:"COMMENT:'资源税';default:0.00"`
-	Fcs     float64 `json:"fcs" gorm:"COMMENT:'房产税';default:0.00"`
-	Yhs     float64 `json:"yhs" gorm:"COMMENT:'印花税';default:0.00"`
-	Hjbhs   float64 `json:"hjbhs" gorm:"COMMENT:'环境保护税';default:0.00"`
-	Ccs     float64 `json:"ccs" gorm:"COMMENT:'车船税';default:0.00"`
-	Cswhjss float64 `json:"cswhjss" gorm:"COMMENT:'城市维护建设税';default:0.00"`
-	Cztdsys float64 `json:"cztdsys" gorm:"COMMENT:'城镇土地使用税';default:0.00"`
-	Gdzys   float64 `json:"gdzys" gorm:"COMMENT:'耕地占用税';default:0.00"`
-	Qs      float64 `json:"qs" gorm:"COMMENT:'契税';default:0.00"`
-	Qtsssr  float64 `json:"qtsssr" gorm:"COMMENT:'其他税收收入';default:0.00"`
+	Zzs      string `json:"zzs" gorm:"COMMENT:'增值税';default:'0.00'"`
+	Xfs      string `json:"xfs" gorm:"COMMENT:'消费税';default:'0.00'"`
+	Qysds    string `json:"qysds" gorm:"COMMENT:'企业所得税';default:'0.00'"`
+	Grsds    string `json:"grsds" gorm:"COMMENT:'个人所得税';default:'0.00'"`
+	Tdzzs    string `json:"tdzzs" gorm:"COMMENT:'土地增值税';default:'0.00'"`
+	Yys      string `json:"yys" gorm:"COMMENT:'营业税';default:'0.00'"`
+	Zys      string `json:"zys" gorm:"COMMENT:'资源税';default:'0.00'"`
+	Fcs      string `json:"fcs" gorm:"COMMENT:'房产税';default:'0.00'"`
+	Yhs      string `json:"yhs" gorm:"COMMENT:'印花税';default:'0.00'"`
+	Hjbhs    string `json:"hjbhs" gorm:"COMMENT:'环境保护税';default:'0.00'"`
+	Ccs      string `json:"ccs" gorm:"COMMENT:'车船税';default:'0.00'"`
+	Cswhjss  string `json:"cswhjss" gorm:"COMMENT:'城市维护建设税';default:'0.00'"`
+	Cztdsys  string `json:"cztdsys" gorm:"COMMENT:'城镇土地使用税';default:'0.00'"`
+	Gdzys    string `json:"gdzys" gorm:"COMMENT:'耕地占用税';default:'0.00'"`
+	Qs       string `json:"qs" gorm:"COMMENT:'契税';default:'0.00'"`
+	Qtsssr   string `json:"qtsssr" gorm:"COMMENT:'其他税收收入';default:'0.00'"`
+	Clgzs    string `json:"clgzs" gorm:"COMMENT:'车辆购置税';default:'0.00'"`
+	Whsyjsf  string `json:"whsyjsf" gorm:"COMMENT:'文化事业建设费';default:'0.00'"`
+	Sljszxsr string `json:"sljszxsr" gorm:"COMMENT:'水利建设专项收入';default:'0.00'"`
+	Cjrjybzj string `json:"cjrjybzj" gorm:"COMMENT:'残疾人就业保障金';default:'0.00'"`
+	Dfjyfj   string `json:"dfjyfj" gorm:"COMMENT:'地方教育附加';default:'0.00'"`
+	Swbmfmsr string `json:"swbmfmsr" gorm:"COMMENT:'税务部门罚没收入';default:'0.00'"`
+	Jyffj    string `json:"jyffj" gorm:"COMMENT:'教育费附加';default:'0.00'"`
+	Qtsr     string `json:"qtsr" gorm:"COMMENT:'其他收入';default:'0.00'"`
 }
 
 // 监控项目--稽查未办结
@@ -50,8 +58,9 @@ type JkxmWjxtdhj struct {
 type JkxmNsxydj struct {
 	ID string `json:"id" gorm:"primary_key"`
 	JkxmBase
-	Nsxydj string `json:"nsxydj" gorm:"COMMENT:'纳税信用等级为D';default:'N'"`
+	Nsxydj string `json:"nsxydj" gorm:"COMMENT:'纳税信用等级为D';default:'Y'"`
 }
+
 // 监控项目--出口退（免）税备案
 type JkxmCktsba struct {
 	ID string `json:"id" gorm:"primary_key"`

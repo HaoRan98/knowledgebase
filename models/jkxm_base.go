@@ -42,6 +42,14 @@ func AddJkxmData(tName string, data interface{}) error {
 	return nil
 }
 
+func UpdateJkxmQs(id string, qs map[string]string) error {
+	if err := db.Table("jkxm_qs").
+		Where("id=?", id).Updates(qs).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
 func ShJkxm(tName, id string, shMap map[string]string) error {
 	if err := db.Table(tName).Where("id=?", id).Updates(shMap).Error; err != nil {
 		return err
@@ -228,6 +236,22 @@ func ReplaceTableFileds(field string) string {
 		field = "耕地占用税"
 	case "qs":
 		field = "契税"
+	case "clgzs":
+		field = "车辆购置税"
+	case "whsyjsf":
+		field = "文化事业建设费"
+	case "sljszxsr":
+		field = "水利建设专项收入"
+	case "cjrjybzj":
+		field = "残疾人就业保障金"
+	case "dfjyfj":
+		field = "地方教育附加"
+	case "swbmfmsr":
+		field = "税务部门罚没收入"
+	case "jyffj":
+		field = "教育费附加"
+	case "qtsr":
+		field = "其他收入"
 	case "qtsssr":
 		field = "其他税收收入"
 

@@ -155,19 +155,33 @@ func GetJkxmByShbz(c *gin.Context) {
 		nsrsbh = c.Query("nsrsbh")
 		xmDm   = c.Query("xm_dm")
 		shbz   = c.Query("shbz")
+		fqrqq  = c.Query("fqrqq")
+		fqrqz  = c.Query("fqrqz")
+		zjrqq  = c.Query("zjrqq")
+		zjrqz  = c.Query("zjrqz")
 		squery string
 	)
+	if fqrqq == "" && fqrqz == "" {
+		fqrqq, fqrqz = "2020-01-01", "2099-12-31"
+	}
+	cond := fmt.Sprintf(
+		" and fqrq>='%s 00:00:00' and fqrq<='%s 23:59:59'", fqrqq, fqrqz)
+	if zjrqq != "" && zjrqz != "" {
+		cond += fmt.Sprintf(
+			" and zjrq>='%s 00:00:00' and zjrq<='%s 23:59:59'", zjrqq, zjrqz)
+	}
 	if strings.Contains(c.Request.URL.Path, "lrsh") {
 		squery = fmt.Sprintf(
-			`select * from %s where shbz='%s'`, xmDm, shbz)
+			`select * from %s where shbz='%s'`, xmDm, shbz) + cond
 	}
 	if strings.Contains(c.Request.URL.Path, "zjsh") {
 		if c.Query("flag") == "" {
 			squery = fmt.Sprintf(
-				`select * from %s where zjshbz='%s' and zjbz='Y'`, xmDm, shbz)
+				`select * from %s where zjshbz='%s' and zjbz='Y'`,
+				xmDm, shbz) + cond
 		} else {
 			squery = fmt.Sprintf(
-				`select * from %s where zjshbz='N' and shbz='Y'`, xmDm)
+				`select * from %s where zjshbz='N' and shbz='Y'`, xmDm) + cond
 		}
 	}
 	if nsrsbh != "" {
@@ -188,9 +202,21 @@ func DownloadJkxmByShbz(c *gin.Context) {
 		nsrsbh = c.Query("nsrsbh")
 		xmDm   = c.Query("xm_dm")
 		shbz   = c.Query("shbz")
+		fqrqq  = c.Query("fqrqq")
+		fqrqz  = c.Query("fqrqz")
+		zjrqq  = c.Query("zjrqq")
+		zjrqz  = c.Query("zjrqz")
 	)
-	squery := fmt.Sprintf(
-		`select * from %s where shbz='Y'`, xmDm)
+	if fqrqq == "" && fqrqz == "" {
+		fqrqq, fqrqz = "2020-01-01", "2099-12-31"
+	}
+	cond := fmt.Sprintf(
+		" and fqrq>='%s 00:00:00' and fqrq<='%s 23:59:59'", fqrqq, fqrqz)
+	if zjrqq != "" && zjrqz != "" {
+		cond += fmt.Sprintf(
+			" and zjrq>='%s 00:00:00' and zjrq<='%s 23:59:59'", zjrqq, zjrqz)
+	}
+	squery := fmt.Sprintf(`select * from %s where shbz='Y'`, xmDm) + cond
 	if shbz != "" {
 		squery += fmt.Sprintf(" and zjshbz='%s'", shbz)
 	}

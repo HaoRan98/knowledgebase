@@ -12,6 +12,7 @@ import (
 //----------------------------定时同步开发区数据中台指标----------------------------
 //欠税
 func SyncJkxmQs(ldDate *models.LdDate) {
+	var add, upd, end int
 	pd, err := models.GetConfigSql("欠税")
 	if err != nil {
 		logging.Error(fmt.Sprintf(
@@ -26,6 +27,7 @@ func SyncJkxmQs(ldDate *models.LdDate) {
 		return
 	}
 	if len(records) > 0 {
+		logging.Info(fmt.Sprintf("需同步欠税数据%d条!", len(records)))
 		//新增&更新欠税
 		for _, record := range records {
 			xm := models.JkxmQs{}
@@ -35,6 +37,7 @@ func SyncJkxmQs(ldDate *models.LdDate) {
 			xm.Fqrq = t
 			xm.ShrName = "后台同步审核"
 			xm.Shrq = t
+			xm.Shbz = "Y"
 			xm.Nsrsbh = record["NSRSBH"]
 			xm.Nsrmc = record["NSRMC"]
 			updXm := map[string]string{
@@ -159,8 +162,9 @@ func SyncJkxmQs(ldDate *models.LdDate) {
 						"添加欠税数据指标异常!失败记录\n:%v", record))
 					continue
 				}
+				add++
 			} else { //update record
-				updXm["nsrsbh"] = r[0]["nsrshb"]
+				updXm["nsrsbh"] = r[0]["nsrsbh"]
 				updXm["nsrmc"] = r[0]["nsrmc"]
 
 				updXm["fqr_account"] = r[0]["fqr_account"]
@@ -178,23 +182,25 @@ func SyncJkxmQs(ldDate *models.LdDate) {
 				if err := models.UpdateJkxmQs(r[0]["id"], updXm); err != nil {
 					logging.Error(fmt.Sprintf(
 						"修改欠税数据指标异常!\n源id:%v\n失败记录\n:%v",
-						r[0]["id"]), record)
+						r[0]["id"], record))
 					continue
 				}
+				upd++
 			}
 		}
 		//清税终结
 		query := "select * from jkxm_qs where zjbz='N'"
 		rs, err := models.QueryData(query)
 		if err != nil {
-			logging.Info("欠税数据指标同步成功!")
+			logging.Info(fmt.Sprintf(
+				"欠税数据指标同步成功!新增%d条，修改%d条！", add, upd))
 			logging.Error("清税终结失败！获取源表欠税指标异常!")
 			return
 		}
 		for _, r := range rs {
 			var flag = false
 			for i, record := range records {
-				if r["nsrshb"] == record["NSRSBH"] {
+				if r["nsrsbh"] == record["NSRSBH"] {
 					records = append(records[:i], records[i+1:]...)
 					flag = true
 					break
@@ -216,8 +222,10 @@ func SyncJkxmQs(ldDate *models.LdDate) {
 						"清税终结失败!\n源id:%v", r["id"]))
 					continue
 				}
+				end++
 			}
 		}
+		logging.Info(fmt.Sprintf("新增%d条,修改%d条,终结%d条!", add, upd, end))
 	}
 	logging.Info("欠税数据指标同步成功!清税终结同步成功!")
 }
@@ -246,6 +254,7 @@ func SyncJkxmCktsba() {
 			xm.Fqrq = t
 			xm.ShrName = "后台同步审核"
 			xm.Shrq = t
+			xm.Shbz = "Y"
 			xm.Nsrsbh = record["NSRSBH"]
 			xm.Nsrmc = record["NSRMC"]
 			query := fmt.Sprintf(

@@ -238,6 +238,8 @@ func PgwbjXmlToDB(rows [][]string, userInfo map[string]string) (impMsg []string)
 			case i == 2:
 				xm.Pgajbh = cell
 			case i == 3:
+				xm.Pgajlx = cell
+			case i == 4:
 				xm.Pgry = cell
 			}
 		}
@@ -438,7 +440,13 @@ func FxfpwclXmlToDB(rows [][]string, userInfo map[string]string) (impMsg []strin
 			case i == 3:
 				xm.Fphm = cell
 			case i == 4:
-				xm.Hsry = cell
+				xm.Je = cell
+			case i == 5:
+				xm.Se = cell
+			case i == 6:
+				xm.Fxlx = cell
+			case i == 7:
+				xm.Rq = cell
 			}
 		}
 		//logging.Debug(fmt.Sprintf("风险发票未处理: %+v", &xm))

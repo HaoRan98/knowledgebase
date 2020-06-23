@@ -262,8 +262,10 @@ func ReplaceTableFileds(field string) string {
 
 	case "pgajbh":
 		field = "评估案件编号"
+	case "pgajlx":
+		field = "评估案件类型"
 	case "pgyr":
-		field = "评估案件编号"
+		field = "评估人员"
 
 	case "sbhjbz":
 		field = "土地增值税申报汇缴标志"
@@ -279,16 +281,24 @@ func ReplaceTableFileds(field string) string {
 		field = "发票号码"
 	case "hsyr":
 		field = "核实人员"
+	case "je":
+		field = "金额"
+	case "se":
+		field = "税额"
+	case "fxlx":
+		field = "风险类型"
+	case "rq":
+		field = "认定/登记日期"
 
 	case "fcdz":
 		field = "房产地址"
 	case "fcbh":
-		field = "房产编号"
+		field = "房产套数"
 
 	case "tddz":
 		field = "土地地址"
 	case "tdbh":
-		field = "土地编号"
+		field = "土地面积"
 
 	case "qtxzxx":
 		field = "其他限制信息"

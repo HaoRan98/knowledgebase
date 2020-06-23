@@ -1,14 +1,15 @@
 package v1
 
 import (
+	"NULL/knowledgebase/models"
 	"NULL/knowledgebase/pkg/app"
 	"NULL/knowledgebase/pkg/e"
 	"NULL/knowledgebase/pkg/setting"
 	"encoding/json"
-	"fmt"
 
 	//"NULL/knowledgebase/pkg/util"
 	"crypto/tls"
+	"fmt"
 	"github.com/parnurzeal/gorequest"
 
 	"github.com/gin-contrib/sessions"
@@ -97,8 +98,8 @@ func Login(c *gin.Context) {
 		depart["departName"] = "XX市信息中心"
 		depart["parentId"] = "13706000000"
 	}
-	userRole := `jkxm_qs,jkxm_qt,jkxm_jcwbj,jkxm_pgwbj,jkxm_wjxtdhj,jkxm_nsxydj,jkxm_fxfpwcl,jkxm_fc,jkxm_td`
-	*/
+	userRole := `jkxm_qs,jkxm_qt,jkxm_jcwbj,jkxm_pgwbj,jkxm_wjxtdhj,jkxm_nsxydj,jkxm_fxfpwcl,jkxm_fc,jkxm_td`*/
+
 	data := map[string]interface{}{
 		"success":     resp["success"],
 		"message":     resp["message"],
@@ -138,4 +139,35 @@ func UserInfo(c *gin.Context) {
 		return
 	}
 	appG.Response(http.StatusOK, e.SUCCESS, nil)
+}
+
+// 获取纳税人信息
+func NsrInfo(c *gin.Context) {
+	var (
+		appG   = app.Gin{C: c}
+		nsrsbh = c.Query("nsrsbh")
+		nsrmc  = "无此纳税人税务登记信息"
+	)
+	//todo
+	/*if nsrsbh == "123" {
+		nsrmc = "测试名称1"
+	}
+	if nsrsbh == "456" {
+		nsrmc = "测试名称2"
+	}*/
+	pd, err := models.GetConfigSql("取纳税人名称")
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR, err.Error())
+		return
+	}
+	sql := fmt.Sprintf(pd.XmSql, nsrsbh)
+	records, err := models.QueryData(sql)
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR, err.Error())
+		return
+	}
+	if len(records) > 0 {
+		nsrmc = records[0]["NSRMC"]
+	}
+	appG.Response(http.StatusOK, e.SUCCESS, nsrmc)
 }

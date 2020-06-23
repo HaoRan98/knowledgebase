@@ -111,6 +111,8 @@ func InitRouter() *gin.Engine {
 	{
 		// 获取用户信息,存入session
 		apiv2.POST("/jkxm/userinfo", v1.UserInfo)
+		// 获取纳税人信息
+		apiv2.GET("/jkxm/nsrmc", v1.NsrInfo)
 		// 导入监控项目
 		apiv2.POST("/jkxm/imp", v2.ImpJkxm)
 		// 监控项目录入审核
@@ -153,6 +155,8 @@ func InitRouter() *gin.Engine {
 		// 下载注销运行情况监控名单
 		apiv2.GET("/jkxm/dlzxqkjk", v2.DownloadZxqkjk)
 
+		// 手动同步后台监控指标
+		apiv2.GET("/jkxm/sync", v2.SyncJkxm)
 		// 获取监控项目名称代码
 		apiv2.GET("/jkxm/mcdm", v2.GetJkxmMcdms)
 	}

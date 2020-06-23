@@ -3,6 +3,7 @@ package v2
 import (
 	"NULL/knowledgebase/models"
 	"NULL/knowledgebase/pkg/app"
+	"NULL/knowledgebase/pkg/cron"
 	"NULL/knowledgebase/pkg/e"
 	"NULL/knowledgebase/pkg/export"
 	"NULL/knowledgebase/pkg/util"
@@ -145,7 +146,7 @@ func GetJkxmsTotal(c *gin.Context) {
 		}
 	}
 	data := map[string]interface{}{
-		"nsrshb": nsrsbh,
+		"nsrsbh": nsrsbh,
 		"nsrmc":  nsrmc,
 		"list":   resps,
 	}
@@ -201,7 +202,7 @@ func GetJkxmsResolve(c *gin.Context) {
 		}
 	}
 	data := map[string]interface{}{
-		"nsrshb": nsrsbh,
+		"nsrsbh": nsrsbh,
 		"nsrmc":  nsrmc,
 		"list":   resps,
 	}
@@ -261,7 +262,7 @@ func GetJkxmsUnsolved(c *gin.Context) {
 		flag = models.IsNsrsbhExist(nsrsbh)
 	}
 	data := map[string]interface{}{
-		"nsrshb": nsrsbh,
+		"nsrsbh": nsrsbh,
 		"nsrmc":  nsrmc,
 		"list":   resps,
 		"flag":   flag, //是否已启动即办注销流程
@@ -588,4 +589,11 @@ func DownloadZxqkjk(c *gin.Context) {
 		}
 	}
 	appG.Response(http.StatusOK, e.SUCCESS, url)
+}
+
+// 手动同步后台监控指标
+func SyncJkxm(c *gin.Context) {
+	appG := app.Gin{C: c}
+	cron.SyncJkxm()
+	appG.Response(http.StatusOK, e.SUCCESS, nil)
 }

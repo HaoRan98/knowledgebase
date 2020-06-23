@@ -43,6 +43,7 @@ type JkxmPgwbj struct {
 	ID string `json:"id" gorm:"primary_key"`
 	JkxmBase
 	Pgajbh string `json:"pgajbh" gorm:"COMMENT:'评估案件编号'"`
+	Pgajlx string `json:"pgajlx" gorm:"COMMENT:'评估案件类型'"`
 	Pgry   string `json:"pgyr" gorm:"COMMENT:'评估人员'"`
 }
 
@@ -73,7 +74,11 @@ type JkxmFxfpwcl struct {
 	JkxmBase
 	Fpdm string `json:"fpdm" gorm:"COMMENT:'发票代码'"`
 	Fphm string `json:"fphm" gorm:"COMMENT:'发票号码'"`
-	Hsry string `json:"hsyr" gorm:"COMMENT:'核实人员'"`
+	//Hsry string `json:"hsyr" gorm:"COMMENT:'核实人员'"`
+	Je   string `json:"je" gorm:"COMMENT:'金额'"`
+	Se   string `json:"se" gorm:"COMMENT:'税额'"`
+	Fxlx string `json:"fxlx" gorm:"COMMENT:'风险类型'"`
+	Rq   string `json:"rq" gorm:"COMMENT:'认定/登记日期'"`
 }
 
 // 监控项目--房产
@@ -81,7 +86,7 @@ type JkxmFc struct {
 	ID string `json:"id" gorm:"primary_key"`
 	JkxmBase
 	Fcdz string `json:"fcdz" gorm:"COMMENT:'房产地址'"`
-	Fcbh string `json:"fcbh" gorm:"COMMENT:'房产编号'"`
+	Fcbh string `json:"fcbh" gorm:"COMMENT:'房产套数'"`
 }
 
 // 监控项目--土地
@@ -89,7 +94,7 @@ type JkxmTd struct {
 	ID string `json:"id" gorm:"primary_key"`
 	JkxmBase
 	Tddz string `json:"tddz" gorm:"COMMENT:'土地地址'"`
-	Tdbh string `json:"tdbh" gorm:"COMMENT:'土地编号'"`
+	Tdbh string `json:"tdbh" gorm:"COMMENT:'土地面积'"`
 }
 
 // 监控项目--其他

@@ -59,6 +59,13 @@ func CommentAgree(id string) error {
 	}
 	return nil
 }
+func RemoveCommentAgree(id string) error {
+	s := fmt.Sprintf("update comment set agree=agree-1 where id='%s'", id)
+	if err := db.Exec(s).Error; err != nil {
+		return err
+	}
+	return nil
+}
 func DelComment(id string) error {
 	if err := db.Table("comment").Where("id=?", id).Delete(Comment{}).Error; err != nil {
 		return err

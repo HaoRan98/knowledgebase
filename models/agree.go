@@ -16,6 +16,14 @@ func Agreed(data interface{}) error {
 	return nil
 }
 
+func RemoveAgreed(agreeid, account string) error {
+	if err := db.Where("agreeid=? and account=?", agreeid, account).
+		Delete(Agree{}).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
 func IsAgreed(agreeid, account string) bool {
 	var agree Agree
 	err := db.Where("agreeid=? and account=?", agreeid, account).First(&agree).Error

@@ -213,6 +213,24 @@ func CommentAgree(c *gin.Context) {
 	}
 	appG.Response(http.StatusOK, e.SUCCESS, nil)
 }
+func RemoveCommentAgree(c *gin.Context) {
+	var appG = app.Gin{C: c}
+	id := c.Param("id")
+	if id == "" {
+		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS_VERIFY, "id can not be nil")
+		return
+	}
+	if err := models.RemoveCommentAgree(id); err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR, err)
+		return
+	}
+	account := util.GetLoginID("", c)
+	if err := models.RemoveAgreed(id, account); err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR, err)
+		return
+	}
+	appG.Response(http.StatusOK, e.SUCCESS, nil)
+}
 func DelComment(c *gin.Context) {
 	var appG = app.Gin{C: c}
 	id := c.Param("id")

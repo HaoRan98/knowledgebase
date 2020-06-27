@@ -91,6 +91,8 @@ func InitRouter() *gin.Engine {
 		apiv1.GET("/reply/accept/:id", v1.AcceptReply)
 		//点赞回帖
 		apiv1.GET("/reply/agree/:id", v1.ReplyAgree)
+		//取消点赞回帖
+		apiv1.GET("/reply/agree_cancel/:id", v1.RemoveReplyAgree)
 		//删除回帖
 		apiv1.GET("/reply/del/:id", v1.DelReply)
 
@@ -102,6 +104,8 @@ func InitRouter() *gin.Engine {
 		apiv1.GET("/comments", v1.GetComments)
 		//点赞评论
 		apiv1.GET("/comment/agree/:id", v1.CommentAgree)
+		//取消点赞评论
+		apiv1.GET("/comment/agree_cancel/:id", v1.RemoveCommentAgree)
 		//删除评论
 		apiv1.GET("/comment/del/:id", v1.DelComment)
 	}

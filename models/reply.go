@@ -60,6 +60,13 @@ func ReplyAgree(id string) error {
 	}
 	return nil
 }
+func RemoveReplyAgree(id string) error {
+	s := fmt.Sprintf("update reply set agree=agree-1 where id='%s'", id)
+	if err := db.Exec(s).Error; err != nil {
+		return err
+	}
+	return nil
+}
 func DelReply(id string) error {
 	tx := db.Begin()
 	defer func() {

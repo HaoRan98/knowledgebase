@@ -1,5 +1,10 @@
 package models
 
+import (
+	"fmt"
+	"github.com/jinzhu/gorm"
+)
+
 // 监控项目--欠税
 type JkxmQs struct {
 	ID string `json:"id" gorm:"primary_key"`
@@ -75,8 +80,8 @@ type JkxmFxfpwcl struct {
 	Fpdm string `json:"fpdm" gorm:"COMMENT:'发票代码'"`
 	Fphm string `json:"fphm" gorm:"COMMENT:'发票号码'"`
 	//Hsry string `json:"hsyr" gorm:"COMMENT:'核实人员'"`
-	Je   string `json:"je" gorm:"COMMENT:'金额'"`
-	Se   string `json:"se" gorm:"COMMENT:'税额'"`
+	Je   string `json:"je" gorm:"COMMENT:'金额';default:'0.00'"`
+	Se   string `json:"se" gorm:"COMMENT:'税额';default:'0.00'"`
 	Fxlx string `json:"fxlx" gorm:"COMMENT:'风险类型'"`
 	Rq   string `json:"rq" gorm:"COMMENT:'认定/登记日期'"`
 }
@@ -102,4 +107,59 @@ type JkxmQt struct {
 	ID string `json:"id" gorm:"primary_key"`
 	JkxmBase
 	Qtxzxx string `json:"qtxzxx" gorm:"COMMENT:'其他限制信息'"`
+}
+
+type NsrInfo struct {
+	Nsrsbh string `json:"nsrsbh"`
+	Nsrmc  string `json:"nsrmc"`
+}
+
+// 风险发票税额超过XX元
+func GetJkxmFxfpOverSe(se string) ([]*NsrInfo, error) {
+	var nsrs []*NsrInfo
+	sql := fmt.Sprintf(`
+select nsrsbh, nsrmc
+from (select nsrsbh, nsrmc, sum(se) sumSe from jkxm_fxfpwcl 
+		where jkxm_fxfpwcl.shbz='Y' group by nsrsbh, nsrmc) a
+where a.sumSe > %s`, se)
+	err := db.Raw(sql).Scan(&nsrs).Error
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return nil, err
+	}
+	if err == gorm.ErrRecordNotFound {
+		return nil, nil
+	}
+	return nsrs, nil
+}
+
+// 风险发票份数超过XX份
+func GetJkxmFxfpOverNum(num string) ([]*NsrInfo, error) {
+	var nsrs []*NsrInfo
+	sql := fmt.Sprintf(`
+select nsrsbh, nsrmc
+from (select nsrsbh, nsrmc,count(nsrsbh) cnt from jkxm_fxfpwcl 
+		where jkxm_fxfpwcl.shbz='Y' group by nsrsbh, nsrmc) a
+where a.cnt > %s`, num)
+	err := db.Raw(sql).Scan(&nsrs).Error
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return nil, err
+	}
+	if err == gorm.ErrRecordNotFound {
+		return nil, nil
+	}
+	return nsrs, nil
+}
+
+// 根据nsrsbh获取风险发票明细
+func GetJkxmFxfpByNsrsbh(nsrsbh string) ([]*JkxmFxfpwcl, error) {
+	var fxfpwcls []*JkxmFxfpwcl
+	err := db.Table("jkxm_fxfpwcl").
+		Where("nsrsbh=?", nsrsbh).Find(&fxfpwcls).Error
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return nil, err
+	}
+	if err == gorm.ErrRecordNotFound {
+		return nil, nil
+	}
+	return fxfpwcls, nil
 }

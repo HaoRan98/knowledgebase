@@ -133,11 +133,19 @@ func InitRouter() *gin.Engine {
 		apiv2.GET("/jkxm/listzjsh", v2.GetJkxmByShbz)
 		// 下载根据审核标志获取对应项目列表(终结审核)
 		apiv2.GET("/jkxm/dlycxx", v2.DownloadJkxmByShbz)
+		// 风险发票超XX份或税额超XX万元的企业名单
+		apiv2.GET("/jkxm/fxfp", v2.GetJkxmFxfp)
+		// 获取风险发票明细
+		apiv2.GET("/jkxm/fxfpmx", v2.GetJkxmFxfpByNsrsbh)
+		// 下载风险发票明细
+		apiv2.GET("/jkxm/dlfxfpmx", v2.DownloadJkxmFxfp)
 
 		// 即办注销监控项目
 		apiv2.POST("/jkxm/jbzx", v2.JbzxJkxm)
 		// 统计工作量
 		apiv2.GET("/jkxm/workload", v2.CountWorkload)
+		// 汇总所有监控项目异常数量
+		apiv2.GET("/jkxms/count", v2.CountJkxms)
 		// 获取所有监控项目异常总数量
 		apiv2.GET("/jkxms/total", v2.GetJkxmsTotal)
 		// 获取所有监控项目异常(已经解除疑点)数量

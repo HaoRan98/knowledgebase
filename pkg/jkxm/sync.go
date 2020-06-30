@@ -277,6 +277,40 @@ func SyncJkxmCktsba() {
 				total--
 				continue
 			}
+			//备案资格终结
+			squery := "select * from jkxm_cktsba where zjbz='N'"
+			rs, err := models.QueryData(squery)
+			if err != nil {
+				logging.Error("备案资格终结失败！获取源表出口备案指标异常!")
+				return
+			}
+			for _, r := range rs {
+				var flag = false
+				for i, record := range records {
+					if r["nsrsbh"] == record["NSRSBH"] {
+						records = append(records[:i], records[i+1:]...)
+						flag = true
+						break
+					}
+				}
+				if flag {
+					continue
+				} else {
+					t := time.Now().Format("2006-01-02 15:04:05")
+					r["zjr_name"] = "后台终结"
+					r["zjrq"] = t
+					r["zjbz"] = "Y"
+
+					r["zjshr_name"] = "后台终审"
+					r["zjshrq"] = t
+					r["zjshbz"] = "Y"
+					if err := models.UpdateJkxmQs(r["id"], r); err != nil {
+						logging.Error(fmt.Sprintf(
+							"备案资格终结失败!\n源id:%v", r["id"]))
+						continue
+					}
+				}
+			}
 		}
 	}
 	logging.Info(fmt.Sprintf("出口退（免）税备案数据指标同步成功,共同步%d条数据!", total))

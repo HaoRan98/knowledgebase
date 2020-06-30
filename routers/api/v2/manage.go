@@ -92,6 +92,73 @@ func CountWorkload(c *gin.Context) {
 	appG.Response(http.StatusOK, e.SUCCESS, data)
 }
 
+type CountResp struct {
+	*models.JkxmMcdm
+	TotalCnt     int `json:"total_cnt"`
+	ResolveCnt   int `json:"resolve_cnt"`
+	UnresolveCnt int `json:"unresolve_cnt"`
+}
+
+// 汇总所有监控项目异常数量
+func CountJkxms(c *gin.Context) {
+	var (
+		appG   = app.Gin{C: c}
+		nsrsbh = c.Query("nsrsbh")
+		fqrqq  = c.Query("fqrqq")
+		fqrqz  = c.Query("fqrqz")
+		zjrqq  = c.Query("zjrqq")
+		zjrqz  = c.Query("zjrqz")
+	)
+	mcdms, err := models.GetJkxmMcdms()
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR, err.Error())
+		return
+	}
+	var nsrmc string
+	var resps = make([]*CountResp, 0)
+	if len(mcdms) > 0 {
+		for _, mcdm := range mcdms {
+			var cond string
+			if nsrsbh != "" {
+				cond = fmt.Sprintf("nsrsbh='%s'", nsrsbh)
+				if nsrmc == "" {
+					query := fmt.Sprintf(
+						`select distinct nsrmc from %s where nsrsbh='%s'`,
+						mcdm.Dm, nsrsbh)
+					nsrmcs, _ := models.QueryData(query)
+					if len(nsrmcs) > 0 {
+						nsrmc = nsrmcs[0]["nsrmc"]
+					}
+				}
+			} else {
+				cond = "nsrsbh like '%'"
+				nsrmc = "合计"
+			}
+			if fqrqq == "" && fqrqz == "" {
+				fqrqq, fqrqz = "2020-01-01", "2099-12-31"
+			}
+			cond += fmt.Sprintf(
+				" and fqrq>='%s 00:00:00' and fqrq<='%s 23:59:59'", fqrqq, fqrqz)
+			if zjrqq != "" && zjrqz != "" {
+				cond += fmt.Sprintf(
+					" and zjrq>='%s 00:00:00' and zjrq<='%s 23:59:59'", zjrqq, zjrqz)
+			}
+			resps = append(resps, &CountResp{
+				JkxmMcdm:     mcdm,
+				TotalCnt:     models.CountJkxmsToal(mcdm.Dm, cond),
+				ResolveCnt:   models.CountJkxmRsolved(mcdm.Dm, cond),
+				UnresolveCnt: models.CountJkxmsUnsolved(mcdm.Dm, cond),
+			})
+		}
+	}
+	data := map[string]interface{}{
+		"nsrsbh": nsrsbh,
+		"nsrmc":  nsrmc,
+		"list":   resps,
+	}
+	appG.Response(http.StatusOK, e.SUCCESS, data)
+}
+
 type Resp struct {
 	*models.JkxmMcdm
 	Cnt int `json:"cnt"`
@@ -288,6 +355,7 @@ func Zxtj(c *gin.Context) {
 		appG.Response(http.StatusInternalServerError, e.ERROR, err.Error())
 		return
 	}
+	//todo
 	//sql := fmt.Sprintf(
 	//	"select * from jkxm_gt3 where zxsj>='%s 00:00:00' and zxsj<='%s 23:59:59'",
 	//	rqq, rqz)
@@ -347,6 +415,7 @@ func JbzxGT3Mx(c *gin.Context) {
 		ldDate := models.NewLdDate("")
 		rqq, rqz = ldDate.LdQrqBn, ldDate.LdCurrentDate
 	}
+	//todo
 	//sql := fmt.Sprintf(
 	//	"select * from jkxm_gt3 where zxsj>='%s 00:00:00' and zxsj<='%s 23:59:59'",
 	//	rqq, rqz)
@@ -397,6 +466,7 @@ func Zxqkjk(c *gin.Context) {
 		appG.Response(http.StatusInternalServerError, e.ERROR, err.Error())
 		return
 	}
+	//todo
 	//sql := fmt.Sprintf(
 	//	"select * from jkxm_gt3 where zxsj>='%s 00:00:00' and zxsj<='%s 23:59:59'",
 	//	rqq, rqz)
@@ -485,6 +555,7 @@ func DownloadGT3Mx(c *gin.Context) {
 		ldDate := models.NewLdDate("")
 		rqq, rqz = ldDate.LdQrqBn, ldDate.LdCurrentDate
 	}
+	//todo
 	//sql := fmt.Sprintf(
 	//	"select * from jkxm_gt3 where zxsj>='%s 00:00:00' and zxsj<='%s 23:59:59'",
 	//	rqq, rqz)
@@ -540,6 +611,7 @@ func DownloadZxqkjk(c *gin.Context) {
 		appG.Response(http.StatusInternalServerError, e.ERROR, err.Error())
 		return
 	}
+	//todo
 	//sql := fmt.Sprintf(
 	//	"select * from jkxm_gt3 where zxsj>='%s 00:00:00' and zxsj<='%s 23:59:59'",
 	//	rqq, rqz)

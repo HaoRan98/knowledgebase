@@ -40,7 +40,7 @@ func ImpJkxm(c *gin.Context) {
 	}
 	file, _, err := c.Request.FormFile("file")
 	if err != nil {
-		appG.Response(http.StatusInternalServerError, e.ERROR, err.Error())
+		appG.Response(http.StatusInternalServerError, e.ERROR, err)
 		return
 	}
 	impMsg := jkxm.ImpJkxm(file, xmDm, userInfo)
@@ -189,7 +189,7 @@ func GetJkxmByShbz(c *gin.Context) {
 	}
 	data, err := models.QueryData(squery)
 	if err != nil {
-		appG.Response(http.StatusInternalServerError, e.ERROR, err.Error())
+		appG.Response(http.StatusInternalServerError, e.ERROR, err)
 		return
 	}
 	appG.Response(http.StatusOK, e.SUCCESS, data)
@@ -225,7 +225,7 @@ func DownloadJkxmByShbz(c *gin.Context) {
 	}
 	records, err := models.QueryData(squery)
 	if err != nil {
-		appG.Response(http.StatusInternalServerError, e.ERROR, err.Error())
+		appG.Response(http.StatusInternalServerError, e.ERROR, err)
 		return
 	}
 	var url = "该监控项目没有异常数据"
@@ -233,7 +233,7 @@ func DownloadJkxmByShbz(c *gin.Context) {
 		fileName := models.GetJkxmMcByDm(xmDm) + strconv.Itoa(int(time.Now().Unix()))
 		url, err = export.WriteIntoExcel(fileName, records)
 		if err != nil {
-			appG.Response(http.StatusInternalServerError, e.ERROR, err.Error())
+			appG.Response(http.StatusInternalServerError, e.ERROR, err)
 			return
 		}
 	}
@@ -251,7 +251,7 @@ func GetJkxmByZjbz(c *gin.Context) {
 	}
 	data, err := models.QueryData(squery)
 	if err != nil {
-		appG.Response(http.StatusInternalServerError, e.ERROR, err.Error())
+		appG.Response(http.StatusInternalServerError, e.ERROR, err)
 		return
 	}
 	appG.Response(http.StatusOK, e.SUCCESS, data)
@@ -262,7 +262,7 @@ func GetJkxmMcdms(c *gin.Context) {
 	appG := app.Gin{C: c}
 	data, err := models.GetJkxmMcdms()
 	if err != nil {
-		appG.Response(http.StatusInternalServerError, e.ERROR, err.Error())
+		appG.Response(http.StatusInternalServerError, e.ERROR, err)
 		return
 	}
 	appG.Response(http.StatusOK, e.SUCCESS, data)

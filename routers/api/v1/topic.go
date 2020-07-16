@@ -159,7 +159,7 @@ func EditTopic(c *gin.Context) {
 	//update document to Es
 	topicEs, err := models.GetTopic(form.ID)
 	if err != nil {
-		log.Println("Get Topic By ID err:", err)
+		log.Println("Get Topic By Key err:", err)
 		appG.Response(http.StatusInternalServerError, e.ERROR, err)
 		return
 	}

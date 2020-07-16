@@ -15,26 +15,40 @@ import (
 //风险发票超XX份或税额超XX万元
 func GetJkxmFxfp(c *gin.Context) {
 	var (
-		appG = app.Gin{C: c}
-		se   = c.Query("se")
-		cnt  = c.Query("cnt")
-		nsrs []*models.NsrInfo
+		appG    = app.Gin{C: c}
+		se      = c.Query("se")
+		cnt     = c.Query("cnt")
+		nsrs    []*models.NsrInfo
+		seNsrs  []*models.NsrInfo
+		numNsrs []*models.NsrInfo
+		err     error
 	)
-	n1, err := models.GetJkxmFxfpOverSe(se)
-	if err != nil {
-		appG.Response(http.StatusInternalServerError, e.ERROR, err)
-		return
+	if se != "0" {
+		seNsrs, err = models.GetJkxmFxfpOverSe(se)
+		if err != nil {
+			appG.Response(http.StatusInternalServerError, e.ERROR, err)
+			return
+		}
 	}
-	if n1 != nil {
-		nsrs = append(nsrs, n1...)
+	if cnt != "0" {
+		numNsrs, err = models.GetJkxmFxfpOverNum(cnt)
+		if err != nil {
+			appG.Response(http.StatusInternalServerError, e.ERROR, err)
+			return
+		}
 	}
-	n2, err := models.GetJkxmFxfpOverNum(cnt)
-	if err != nil {
-		appG.Response(http.StatusInternalServerError, e.ERROR, err)
-		return
-	}
-	if n2 != nil {
-		nsrs = append(nsrs, n2...)
+	if se != "0" && cnt != "0" {
+		for _, seNsr := range seNsrs {
+			for _, numNsr := range numNsrs {
+				if seNsr.Nsrsbh == numNsr.Nsrsbh {
+					nsrs = append(nsrs, seNsr)
+				}
+			}
+		}
+	} else if se != "0" && cnt == "0" {
+		nsrs = append(nsrs, seNsrs...)
+	} else if se == "0" && cnt != "0" {
+		nsrs = append(nsrs, numNsrs...)
 	}
 	appG.Response(http.StatusOK, e.SUCCESS, nsrs)
 }
@@ -46,7 +60,6 @@ func GetJkxmFxfpByNsrsbh(c *gin.Context) {
 		se     = c.Query("se")
 		cnt    = c.Query("cnt")
 		nsrsbh = c.Query("nsrsbh") //不传取全部，传取某一户
-		nsrs   []*models.NsrInfo
 	)
 	if len(nsrsbh) > 0 {
 		fxfpwcls, err := models.GetJkxmFxfpByNsrsbh(nsrsbh)
@@ -59,22 +72,40 @@ func GetJkxmFxfpByNsrsbh(c *gin.Context) {
 			return
 		}
 		appG.Response(http.StatusOK, e.SUCCESS, nil)
-	}
-	n1, err := models.GetJkxmFxfpOverSe(se)
-	if err != nil {
-		appG.Response(http.StatusInternalServerError, e.ERROR, err)
 		return
 	}
-	if n1 != nil {
-		nsrs = append(nsrs, n1...)
+	var (
+		nsrs    []*models.NsrInfo
+		seNsrs  []*models.NsrInfo
+		numNsrs []*models.NsrInfo
+		err     error
+	)
+	if se != "0" {
+		seNsrs, err = models.GetJkxmFxfpOverSe(se)
+		if err != nil {
+			appG.Response(http.StatusInternalServerError, e.ERROR, err)
+			return
+		}
 	}
-	n2, err := models.GetJkxmFxfpOverNum(cnt)
-	if err != nil {
-		appG.Response(http.StatusInternalServerError, e.ERROR, err)
-		return
+	if cnt != "0" {
+		numNsrs, err = models.GetJkxmFxfpOverNum(cnt)
+		if err != nil {
+			appG.Response(http.StatusInternalServerError, e.ERROR, err)
+			return
+		}
 	}
-	if n2 != nil {
-		nsrs = append(nsrs, n2...)
+	if se != "0" && cnt != "0" {
+		for _, seNsr := range seNsrs {
+			for _, numNsr := range numNsrs {
+				if seNsr.Nsrsbh == numNsr.Nsrsbh {
+					nsrs = append(nsrs, seNsr)
+				}
+			}
+		}
+	} else if se != "0" && cnt == "0" {
+		nsrs = append(nsrs, seNsrs...)
+	} else if se == "0" && cnt != "0" {
+		nsrs = append(nsrs, numNsrs...)
 	}
 	data := make([]*models.JkxmFxfpwcl, 0)
 	if len(nsrs) > 0 {
@@ -100,7 +131,6 @@ func DownloadJkxmFxfp(c *gin.Context) {
 		se      = c.Query("se")
 		cnt     = c.Query("cnt")
 		nsrsbh  = c.Query("nsrsbh")
-		nsrs    []*models.NsrInfo
 		records = make([]map[string]string, 0)
 	)
 	var url = "该监控项目没有异常数据"
@@ -116,21 +146,38 @@ func DownloadJkxmFxfp(c *gin.Context) {
 			records = append(records, record...)
 		}
 	} else {
-		n1, err := models.GetJkxmFxfpOverSe(se)
-		if err != nil {
-			appG.Response(http.StatusInternalServerError, e.ERROR, err)
-			return
+		var (
+			nsrs    []*models.NsrInfo
+			seNsrs  []*models.NsrInfo
+			numNsrs []*models.NsrInfo
+			err     error
+		)
+		if se != "0" {
+			seNsrs, err = models.GetJkxmFxfpOverSe(se)
+			if err != nil {
+				appG.Response(http.StatusInternalServerError, e.ERROR, err)
+				return
+			}
 		}
-		if n1 != nil {
-			nsrs = append(nsrs, n1...)
+		if cnt != "0" {
+			numNsrs, err = models.GetJkxmFxfpOverNum(cnt)
+			if err != nil {
+				appG.Response(http.StatusInternalServerError, e.ERROR, err)
+				return
+			}
 		}
-		n2, err := models.GetJkxmFxfpOverNum(cnt)
-		if err != nil {
-			appG.Response(http.StatusInternalServerError, e.ERROR, err)
-			return
-		}
-		if n2 != nil {
-			nsrs = append(nsrs, n2...)
+		if se != "0" && cnt != "0" {
+			for _, seNsr := range seNsrs {
+				for _, numNsr := range numNsrs {
+					if seNsr.Nsrsbh == numNsr.Nsrsbh {
+						nsrs = append(nsrs, seNsr)
+					}
+				}
+			}
+		} else if se != "0" && cnt == "0" {
+			nsrs = append(nsrs, seNsrs...)
+		} else if se == "0" && cnt != "0" {
+			nsrs = append(nsrs, numNsrs...)
 		}
 		if len(nsrs) > 0 {
 			for _, nsr := range nsrs {

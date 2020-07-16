@@ -135,7 +135,7 @@ func EditReply(c *gin.Context) {
 	//update document to Es
 	replyEs, err := models.GetReply(form.ID)
 	if err != nil {
-		log.Println("Get Reply By ID err:", err)
+		log.Println("Get Reply By Key err:", err)
 		appG.Response(http.StatusInternalServerError, e.ERROR, err)
 		return
 	}

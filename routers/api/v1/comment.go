@@ -115,7 +115,7 @@ func EditComment(c *gin.Context) {
 	//update document to Es
 	commentEs, err := models.GetCommentByID(form.ID)
 	if err != nil {
-		log.Println("Get Comment By ID err:", err)
+		log.Println("Get Comment By Key err:", err)
 		appG.Response(http.StatusInternalServerError, e.ERROR, err)
 		return
 	}

@@ -8,6 +8,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"github.com/parnurzeal/gorequest"
+	"strings"
 
 	"fmt"
 	"github.com/gin-contrib/sessions"
@@ -43,7 +44,6 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	//todo
 	// 引入"crypto/tls":解决golang https请求提示x509: certificate signed by unknown authority
 	ts := &tls.Config{InsecureSkipVerify: true}
 	pMap := map[string]string{
@@ -168,4 +168,119 @@ func NsrInfo(c *gin.Context) {
 		nsrmc = records[0]["NSRMC"]
 	}
 	appG.Response(http.StatusOK, e.SUCCESS, nsrmc)
+}
+
+// 代理转发智税平台用户登录
+func Rlogin(c *gin.Context) {
+	var (
+		appG = app.Gin{C: c}
+		form LoginForm
+	)
+	resp := map[string]interface{}{}
+	result := map[string]interface{}{}
+	httpCode, errCode := app.BindAndValid(c, &form)
+	if errCode != e.SUCCESS {
+		appG.Response(httpCode, errCode, nil)
+		return
+	}
+
+	// 引入"crypto/tls":解决golang https请求提示x509: certificate signed by unknown authority
+	ts := &tls.Config{InsecureSkipVerify: true}
+	pMap := map[string]string{
+		"username": form.Username,
+		"password": form.Password,
+	}
+	_, body, errs := gorequest.New().TLSClientConfig(ts).
+		Post(setting.AppSetting.LoginUrl + "/jeecg-boot/sys/login").
+		Type(gorequest.TypeJSON).SendMap(pMap).End()
+	if len(errs) > 0 {
+		data := fmt.Sprintf("login err:%v", errs[0])
+		appG.Response(http.StatusOK, e.ERROR, data)
+		return
+	} else {
+		err := json.Unmarshal([]byte(body), &resp)
+		if err != nil {
+			data := fmt.Sprintf("unmarshall body error:%v", err)
+			appG.Response(http.StatusOK, e.ERROR, data)
+			return
+		}
+		if resp["result"] != nil {
+			result = resp["result"].(map[string]interface{})
+			appG.Response(http.StatusOK, e.SUCCESS, result)
+			return
+		}
+		appG.Response(http.StatusOK, e.ERROR, nil)
+	}
+}
+
+//获取数据中台路由表
+func GetRoutes(c *gin.Context) {
+	var appG = app.Gin{C: c}
+	var IeHeader = `Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Win64; x64; Trident/4.0; .NET CLR 2.0.limit727; SLCC2; .NET CLR 3.5.30729; .NET CLR 3.0.30729; .NET4.0C; .NET4.0E)`
+
+	token := c.Query("token")
+	// 引入"crypto/tls":解决golang https请求提示x509: certificate signed by unknown authority
+	ts := &tls.Config{InsecureSkipVerify: true}
+	url := setting.AppSetting.LoginUrl + "/jeecg-boot/sys/permission/getUserPermissionByToken" +
+		"?token=" + token
+	_, body, errs := gorequest.New().TLSClientConfig(ts).Get(url).
+		Set("Content-Type", "application/json").
+		Set("X-Access-Token", token).Set("Accept-Language", "zh-CN").
+		Set("Accept", "*/*").Set("User-Agent", IeHeader).End()
+	if len(errs) > 0 {
+		data := fmt.Sprintf("Get routes err:%v", errs[0])
+		appG.Response(http.StatusOK, e.ERROR, data)
+		return
+	} else {
+		if !strings.Contains(body, "查询成功") {
+			appG.Response(http.StatusOK, e.ERROR, body)
+			return
+		}
+		resp := make(map[string]interface{})
+		result := map[string]interface{}{}
+		err := json.Unmarshal([]byte(body), &resp)
+		if err != nil {
+			data := fmt.Sprintf("unmarshall body error:%v", err)
+			appG.Response(http.StatusOK, e.ERROR, data)
+			return
+		}
+		if resp["result"] != nil {
+			result = resp["result"].(map[string]interface{})
+			menu := make(map[string]interface{})
+			for _, m := range result["menu"].([]interface{}) {
+				mMap := m.(map[string]interface{})
+				if mMap["path"].(string) == "/shuiwuyewu" {
+					menu = map[string]interface{}{
+						"redirect":  mMap["redirect"],
+						"path":      mMap["path"],
+						"component": mMap["component"],
+						"route":     mMap["route"],
+					}
+					for _, c := range mMap["children"].([]interface{}) {
+						cMap := c.(map[string]interface{})
+						if cMap["path"].(string) == "/zxfxsm" {
+							menu["children"] = []map[string]interface{}{
+								{
+									"path":      cMap["path"],
+									"component": cMap["component"],
+									"route":     cMap["route"],
+									"children":  cMap["children"],
+								},
+							}
+						}
+					}
+				}
+			}
+			appG.Response(http.StatusOK, e.SUCCESS,
+				map[string]interface{}{
+					"allAuth": result["allAuth"],
+					"auth":    result["auth"],
+					"menu": []map[string]interface{}{
+						menu,
+					},
+				})
+			return
+		}
+		appG.Response(http.StatusOK, e.ERROR, nil)
+	}
 }

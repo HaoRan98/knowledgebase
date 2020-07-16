@@ -54,7 +54,7 @@ func EsDocument(index, id, jsonStr string) (string, string) {
 	defer res.Body.Close()
 
 	if res.IsError() {
-		return "", fmt.Sprintf("[%s] Error indexing document ID=%s", res.Status(), id)
+		return "", fmt.Sprintf("[%s] Error indexing document Key=%s", res.Status(), id)
 	} else {
 		// Deserialize the response into a map.
 		var r map[string]interface{}
@@ -112,12 +112,12 @@ func EsSearch(index, key string) ([]interface{}, string) {
 	took := int(r["took"].(float64))
 	log.Printf("[%s] %d hits; took: %dms", res.Status(), total, took)
 
-	// Print the ID and document source for each hit.
+	// Print the Key and document source for each hit.
 	for _, hit := range r["hits"].(map[string]interface{})["hits"].([]interface{}) {
 		source := hit.(map[string]interface{})["_source"]
 		// debug
 		//id := hit.(map[string]interface{})["_id"]
-		//log.Printf(" * ID=%s, %s", id, source)
+		//log.Printf(" * Key=%s, %s", id, source)
 		results = append(results, source)
 	}
 	return results, ""

@@ -29,17 +29,24 @@ func InitRouter() *gin.Engine {
 	r.Use(gin.Recovery())
 	r.Use(cors.CORSMiddleware())
 
-	r.GET("/", api.Home)
-	r.GET("/klib", api.Home)
 	r.StaticFS("/export", http.Dir(export.GetExcelFullPath()))
 	r.StaticFS("/qrcode", http.Dir(qrcode.GetQrCodeFullPath()))
+
+	r.GET("/", api.Home)
+	r.GET("/klib", api.Home)
 	r.Static("/css", "runtime/static/css")
 	r.Static("/js", "runtime/static/js")
 	r.Static("/img", "runtime/static/img")
+	r.Static("/logo.png", "runtime/static/logo.png")
+	r.Static("/favicon.ico", "runtime/static/favicon.ico")
 
 	r.POST("/login", v1.Login)
 	r.GET("/ws", v1.Websocket(mr))
 	r.POST("/topic/imp", v1.ImpTopic)
+
+	//代理转发智税平台登陆/获取路由表
+	r.POST("/r_login", v1.Rlogin)
+	r.GET("/r_route", v1.GetRoutes)
 
 	apiv1 := r.Group("/api/v1")
 	apiv1.Use(jwt.JWT())
@@ -133,7 +140,7 @@ func InitRouter() *gin.Engine {
 		apiv2.GET("/jkxm/listzjsh", v2.GetJkxmByShbz)
 		// 下载根据审核标志获取对应项目列表(终结审核)
 		apiv2.GET("/jkxm/dlycxx", v2.DownloadJkxmByShbz)
-		// 风险发票超XX份或税额超XX万元的企业名单
+		// 风险发票超XX份、税额超XX万元的企业名单
 		apiv2.GET("/jkxm/fxfp", v2.GetJkxmFxfp)
 		// 获取风险发票明细
 		apiv2.GET("/jkxm/fxfpmx", v2.GetJkxmFxfpByNsrsbh)

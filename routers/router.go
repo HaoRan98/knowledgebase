@@ -37,8 +37,11 @@ func InitRouter() *gin.Engine {
 	r.Static("/css", "runtime/static/css")
 	r.Static("/js", "runtime/static/js")
 	r.Static("/img", "runtime/static/img")
-	r.Static("/logo.png", "runtime/static/logo.png")
-	r.Static("/favicon.ico", "runtime/static/favicon.ico")
+
+	r.GET("/sjzt", api.JkxmIndex)
+	r.Static("/jkxm/css", "runtime/static_jkxm/css")
+	r.Static("/jkxm/js", "runtime/static_jkxm/js")
+	r.Static("/jkxm/img", "runtime/static_jkxm/img")
 
 	r.POST("/login", v1.Login)
 	r.GET("/ws", v1.Websocket(mr))

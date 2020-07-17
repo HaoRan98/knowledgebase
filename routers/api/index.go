@@ -12,3 +12,10 @@ func Home(c *gin.Context) {
 		util.ShowError("template parseFiles err", t.Execute(c.Writer, nil))
 	}
 }
+
+func JkxmIndex(c *gin.Context) {
+	if c.Request.Method == "GET" {
+		t, _ := template.ParseFiles("runtime/static_jkxm/index.html")
+		util.ShowError("template parseFiles err", t.Execute(c.Writer, nil))
+	}
+}

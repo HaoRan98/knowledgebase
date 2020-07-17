@@ -4,8 +4,9 @@ import (
 	"NULL/knowledgebase/models"
 	"NULL/knowledgebase/pkg/util"
 	"fmt"
-	"github.com/360EntSecGroup-Skylar/excelize"
+	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	"io"
+	"strconv"
 	"time"
 )
 
@@ -446,7 +447,14 @@ func FxfpwclXmlToDB(rows [][]string, userInfo map[string]string) (impMsg []strin
 			case i == 6:
 				xm.Fxlx = cell
 			case i == 7:
-				xm.Rq = cell
+				b, err := strconv.ParseFloat(cell, 64)
+				t, err := excelize.ExcelDateToTime(b, false)
+				if err != nil {
+					impMsg = append(impMsg, fmt.Sprintf(
+						"第%d行日期格式导入错误:%v", k+1, err))
+					continue
+				}
+				xm.Rq = t.Format("2006-01-02 15:04:05")
 			}
 		}
 		//logging.Debug(fmt.Sprintf("风险发票未处理: %+v", &xm))

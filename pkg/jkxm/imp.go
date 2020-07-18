@@ -22,7 +22,11 @@ func ImpJkxm(fileName io.Reader, xmDm string, userInfo map[string]string) (impMs
 		impMsg = append(impMsg, "导入错误,该用户无此监控项目导入权限!")
 		return
 	}
-	rows := xlsx.GetRows(sheetName)
+	rows, err := xlsx.GetRows(sheetName)
+	if err != nil {
+		impMsg = append(impMsg, "导入错误,文件读取失败!请联系管理员!")
+		return
+	}
 	switch sheetName {
 	case "jkxm_qs":
 		erMsg := QsXmlToDB(rows, userInfo)

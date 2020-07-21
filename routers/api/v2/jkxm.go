@@ -21,7 +21,7 @@ type ShZjForm struct {
 	Id   []string `json:"id"`
 }
 
-// 导入监控项目:导入模板工作表保护密码：fsdj_admin
+// 导入监控项目:
 func ImpJkxm(c *gin.Context) {
 	var (
 		appG    = app.Gin{C: c}

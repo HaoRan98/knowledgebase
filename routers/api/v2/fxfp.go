@@ -136,7 +136,7 @@ func DownloadJkxmFxfp(c *gin.Context) {
 	var url = "该监控项目没有异常数据"
 	if len(nsrsbh) > 0 {
 		squery := fmt.Sprintf(
-			`select * from jkxm_fxfpwcl where nsrsbh='%s'`, nsrsbh)
+			`select * from jkxm_fxfpwcl where nsrsbh='%s where shbz='Y'`, nsrsbh)
 		record, err := models.QueryData(squery)
 		if err != nil {
 			appG.Response(http.StatusInternalServerError, e.ERROR, err)

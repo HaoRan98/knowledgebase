@@ -120,7 +120,7 @@ func GetJkxmFxfpOverSe(se string) ([]*NsrInfo, error) {
 	sql := fmt.Sprintf(`
 select nsrsbh, nsrmc
 from (select nsrsbh, nsrmc, sum(se) sumSe from jkxm_fxfpwcl 
-		where jkxm_fxfpwcl.shbz='Y' group by nsrsbh, nsrmc) a
+		where shbz='Y' group by nsrsbh, nsrmc) a
 where a.sumSe > %s`, se)
 	err := db.Raw(sql).Scan(&nsrs).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
@@ -138,7 +138,7 @@ func GetJkxmFxfpOverNum(num string) ([]*NsrInfo, error) {
 	sql := fmt.Sprintf(`
 select nsrsbh, nsrmc
 from (select nsrsbh, nsrmc,count(nsrsbh) cnt from jkxm_fxfpwcl 
-		where jkxm_fxfpwcl.shbz='Y' group by nsrsbh, nsrmc) a
+		where shbz='Y' group by nsrsbh, nsrmc) a
 where a.cnt > %s`, num)
 	err := db.Raw(sql).Scan(&nsrs).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
@@ -154,7 +154,7 @@ where a.cnt > %s`, num)
 func GetJkxmFxfpByNsrsbh(nsrsbh string) ([]*JkxmFxfpwcl, error) {
 	var fxfpwcls []*JkxmFxfpwcl
 	err := db.Table("jkxm_fxfpwcl").
-		Where("nsrsbh=?", nsrsbh).Find(&fxfpwcls).Error
+		Where("nsrsbh=? and shbz='Y'", nsrsbh).Find(&fxfpwcls).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
 		return nil, err
 	}

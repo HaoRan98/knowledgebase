@@ -96,8 +96,8 @@ func Login(c *gin.Context) {
 		depart["departName"] = "XX市信息中心"
 		depart["parentId"] = "13706000000"
 	}
-	userRole := `jkxm_qs,jkxm_qt,jkxm_jcwbj,jkxm_pgwbj,jkxm_wjxtdhj,jkxm_nsxydj,jkxm_fxfpwcl,jkxm_fc,jkxm_td`
-	*/
+	userRole := `jkxm_qs,jkxm_qt,jkxm_jcwbj,jkxm_pgwbj,jkxm_wjxtdhj,jkxm_nsxydj,jkxm_fxfpwcl,jkxm_fc,jkxm_td`*/
+
 	data := map[string]interface{}{
 		"success":     resp["success"],
 		"message":     resp["message"],

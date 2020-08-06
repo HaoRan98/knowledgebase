@@ -72,9 +72,10 @@ func GetTopics(account, kind string, pageNo, pageSize int) ([]*Topic, error) {
 	}
 	return nil, nil
 }
-func GetTopicsCnt(account string) (cnt int) {
+func GetTopicsCnt(account, kind string) (cnt int) {
 	if err := db.Table("topic").
 		Where("account like ?", "%"+account+"%").
+		Where("kind like ?", "%"+kind+"%").
 		Count(&cnt).Error; err != nil {
 		cnt = 0
 	}

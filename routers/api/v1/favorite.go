@@ -25,6 +25,16 @@ func AddFavorite(c *gin.Context) {
 	}
 	appG.Response(http.StatusOK, e.SUCCESS, nil)
 }
+func CancelFavorite(c *gin.Context) {
+	appG := app.Gin{C: c}
+	topicId := c.Query("id")
+	account := util.GetLoginID("", c)
+	if err := models.CancelFavorite(topicId, account); err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR, err)
+		return
+	}
+	appG.Response(http.StatusOK, e.SUCCESS, nil)
+}
 func GetFavorites(c *gin.Context) {
 	var (
 		appG     = app.Gin{C: c}

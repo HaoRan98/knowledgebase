@@ -76,6 +76,8 @@ func InitRouter() *gin.Engine {
 
 		//收藏帖子
 		apiv1.GET("/favorite/add", v1.AddFavorite)
+		//取消收藏帖子
+		apiv1.GET("/favorite/cancel", v1.CancelFavorite)
 		//获取收藏列表
 		apiv1.GET("/favorites", v1.GetFavorites)
 		//删除收藏

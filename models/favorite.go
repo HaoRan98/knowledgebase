@@ -1,5 +1,7 @@
 package models
 
+import "github.com/jinzhu/gorm"
+
 //发帖
 type Favorite struct {
 	ID      string `json:"id" gorm:"primary_key"`
@@ -11,6 +13,13 @@ type Favorite struct {
 
 func AddFavorite(data interface{}) error {
 	if err := db.Create(data).Error; err != nil {
+		return err
+	}
+	return nil
+}
+func CancelFavorite(topicId, account string) error {
+	if err := db.Table("favorite").
+		Where("topic_id=? and account=?", topicId, account).Delete(Favorite{}).Error; err != nil {
 		return err
 	}
 	return nil
@@ -48,4 +57,18 @@ func DelFavorite(id string) error {
 		return err
 	}
 	return nil
+}
+func IsFavorite(topicId, account string) bool {
+	var fav Favorite
+	err := db.Where("topic_id=? and account=?", topicId, account).First(&fav).Error
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return true
+	}
+	if err == gorm.ErrRecordNotFound {
+		return false
+	}
+	if len(fav.ID) > 0 {
+		return true
+	}
+	return false
 }

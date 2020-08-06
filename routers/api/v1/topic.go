@@ -28,6 +28,7 @@ type TpResp struct {
 	*models.Topic
 	Replys []*RpResp
 	Agreed bool `json:"agreed"`
+	Faved  bool `json:"faved"`
 }
 
 func ImpTopic(c *gin.Context) {
@@ -200,7 +201,9 @@ func GetTopic(c *gin.Context) {
 			replyResps = append(replyResps, &RpResp{&reply, nil, rpFlag})
 		}
 		tpFlag := models.IsAgreed(topic.ID, loginId)
-		appG.Response(http.StatusOK, e.SUCCESS, TpResp{topic, replyResps, tpFlag})
+		favFlag := models.IsFavorite(topic.ID, loginId)
+		appG.Response(http.StatusOK, e.SUCCESS, TpResp{
+			Topic: topic, Replys: replyResps, Agreed: tpFlag, Faved: favFlag})
 		return
 	}
 	appG.Response(http.StatusOK, e.SUCCESS, nil)
@@ -254,12 +257,14 @@ func GetTopics(c *gin.Context) {
 				replyResps = append(replyResps, &RpResp{&reply, nil, rpFlag})
 			}
 			tpFlag := models.IsAgreed(tp.ID, loginId)
-			tpResps = append(tpResps, TpResp{tp, replyResps, tpFlag})
+			favFlag := models.IsFavorite(tp.ID, loginId)
+			tpResps = append(tpResps, TpResp{
+				Topic: tp, Replys: replyResps, Agreed: tpFlag, Faved: favFlag})
 		}
 		appG.Response(http.StatusOK, e.SUCCESS,
 			map[string]interface{}{
 				"list": tpResps,
-				"cnt":  models.GetTopicsCnt(account),
+				"cnt":  models.GetTopicsCnt(account, kind),
 			})
 		return
 	}

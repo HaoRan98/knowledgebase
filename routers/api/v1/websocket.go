@@ -157,14 +157,16 @@ func BroadCastTopic() {
 			for _, rp := range topic.Replys {
 				rpFlag := models.IsAgreed(rp.ID, loginId)
 				reply := rp
-				replyResps = append(replyResps, &RpResp{&reply, nil, rpFlag})
+				replyResps = append(replyResps, &RpResp{Reply: &reply, Agreed: rpFlag})
 			}
 			tpFlag := models.IsAgreed(topic.ID, loginId)
-			tpResps = append(tpResps, TpResp{topic, replyResps, tpFlag})
+			favFlag := models.IsFavorite(topic.ID, loginId)
+			tpResps = append(tpResps, TpResp{
+				Topic: topic, Replys: replyResps, Agreed: tpFlag, Faved: favFlag})
 		}
 		resp := map[string]interface{}{
 			"list": tpResps,
-			"cnt":  models.GetTopicsCnt(""),
+			"cnt":  models.GetTopicsCnt("", ""),
 		}
 		msg := WsMsg{
 			MsType: "topic",
@@ -228,12 +230,12 @@ func BroadCastCount() {
 	lock.Lock()
 	//统计信息
 	count := map[string]int{
-		"topicNum":   models.GetTopicsCnt(""),    //发帖数
-		"replyNum":   models.GetRepliesCnt(""),   //回帖数
-		"commentNum": models.GetCommentsCnt(""),  //评论数
-		"browseCnt":  models.GetTopicBrowseCnt(), //总浏览量
-		"searchCnt":  models.Info.Browse,         //搜索量
-		"wordCnt":    wordCnt,                    //字数统计
+		"topicNum":   models.GetTopicsCnt("", ""), //发帖数
+		"replyNum":   models.GetRepliesCnt(""),    //回帖数
+		"commentNum": models.GetCommentsCnt(""),   //评论数
+		"browseCnt":  models.GetTopicBrowseCnt(),  //总浏览量
+		"searchCnt":  models.Info.Browse,          //搜索量
+		"wordCnt":    wordCnt,                     //字数统计
 	}
 	msg := WsMsg{
 		MsType: "count",

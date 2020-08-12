@@ -355,7 +355,7 @@ func Zxtj(c *gin.Context) {
 		appG.Response(http.StatusInternalServerError, e.ERROR, err.Error())
 		return
 	}
-	//todo
+	//todo:internet test
 	//sql := fmt.Sprintf(
 	//	"select * from jkxm_gt3 where zxsj>='%s 00:00:00' and zxsj<='%s 23:59:59'",
 	//	rqq, rqz)

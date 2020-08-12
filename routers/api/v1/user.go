@@ -72,7 +72,7 @@ func Login(c *gin.Context) {
 		}
 	}
 
-	//internet test
+	//todo:internet test
 	/*token, _ := util.GenerateToken(form.Username, form.Password)
 	if form.Username == "test" {
 		resp["success"] = "True"
@@ -108,7 +108,7 @@ func Login(c *gin.Context) {
 		"departID":    depart["id"],
 		"departName":  depart["departName"],
 		"parentId":    depart["parentId"],
-		//todo:test
+		//todo:internet test
 		//"userRole": userRole,
 	}
 
@@ -146,7 +146,7 @@ func NsrInfo(c *gin.Context) {
 		nsrsbh = c.Query("nsrsbh")
 		nsrmc  = "无此纳税人税务登记信息"
 	)
-	//todo
+	//todo:internet test
 	/*if nsrsbh == "123" {
 		nsrmc = "测试名称1"
 	}

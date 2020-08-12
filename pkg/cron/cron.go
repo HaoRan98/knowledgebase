@@ -52,6 +52,4 @@ func SyncJkxm() {
 	ldDate := models.NewLdDate("")
 	jkxm.SyncJkxmQs(ldDate)
 	jkxm.SyncJkxmCktsba()
-	//jkxm.SyncJkxmPgwbj(ldDate)
-	//jkxm.SyncJkxmNsxydj(ldDate)
 }

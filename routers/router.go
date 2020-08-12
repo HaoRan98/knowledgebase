@@ -32,8 +32,8 @@ func InitRouter() *gin.Engine {
 	r.StaticFS("/export", http.Dir(export.GetExcelFullPath()))
 	r.StaticFS("/qrcode", http.Dir(qrcode.GetQrCodeFullPath()))
 
-	r.GET("/", api.Home)
-	r.GET("/klib", api.Home)
+	r.GET("/", api.KlibIndex)
+	r.GET("/klib", api.KlibIndex)
 	r.Static("/css", "runtime/static/css")
 	r.Static("/js", "runtime/static/js")
 	r.Static("/img", "runtime/static/img")
@@ -42,6 +42,16 @@ func InitRouter() *gin.Engine {
 	r.Static("/jkxm/css", "runtime/static_jkxm/css")
 	r.Static("/jkxm/js", "runtime/static_jkxm/js")
 	r.Static("/jkxm/img", "runtime/static_jkxm/img")
+
+	r.GET("/kfqzmq1", api.KfqZmq1)
+	r.Static("/kfqzmq1/css", "runtime/static_kfqzmq1/css")
+	r.Static("/kfqzmq1/js", "runtime/static_kfqzmq1/js")
+	r.Static("/kfqzmq1/img", "runtime/static_kfqzmq1/img")
+
+	r.GET("/kfqzmq2", api.KfqZmq2)
+	r.Static("/kfqzmq2/css", "runtime/static_kfqzmq2/css")
+	r.Static("/kfqzmq2/js", "runtime/static_kfqzmq2/js")
+	r.Static("/kfqzmq2/img", "runtime/static_kfqzmq2/img")
 
 	r.POST("/login", v1.Login)
 	r.GET("/ws", v1.Websocket(mr))

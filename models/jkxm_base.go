@@ -1,6 +1,9 @@
 package models
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 // 监控项目--基础表
 type JkxmBase struct {
@@ -59,6 +62,14 @@ func ShJkxm(tName, id string, shMap map[string]string) error {
 
 func ZjJkxm(tName, id string, zjMap map[string]string) error {
 	if err := db.Table(tName).Where("id=?", id).Updates(zjMap).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func DelJkxm(tName, id string) error {
+	sql := fmt.Sprintf("delete from %s where id=%s", tName, id)
+	if err := db.Exec(sql).Error; err != nil {
 		return err
 	}
 	return nil

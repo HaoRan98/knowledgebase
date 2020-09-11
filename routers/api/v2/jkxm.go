@@ -6,6 +6,7 @@ import (
 	"NULL/knowledgebase/pkg/e"
 	"NULL/knowledgebase/pkg/export"
 	"NULL/knowledgebase/pkg/jkxm"
+	"NULL/knowledgebase/pkg/logging"
 	"fmt"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -16,7 +17,7 @@ import (
 	"time"
 )
 
-type ShZjForm struct {
+type JkxmForm struct {
 	XmDm string   `json:"xm_dm"`
 	Id   []string `json:"id"`
 }
@@ -52,7 +53,7 @@ func ShJkxm(c *gin.Context) {
 	var (
 		appG    = app.Gin{C: c}
 		session = sessions.Default(c)
-		form    ShZjForm
+		form    JkxmForm
 	)
 	httpCode, errCode := app.BindAndValid(c, &form)
 	if errCode != e.SUCCESS {
@@ -109,7 +110,7 @@ func ZjJkxm(c *gin.Context) {
 	var (
 		appG    = app.Gin{C: c}
 		session = sessions.Default(c)
-		form    ShZjForm
+		form    JkxmForm
 	)
 	httpCode, errCode := app.BindAndValid(c, &form)
 	if errCode != e.SUCCESS {
@@ -144,6 +145,32 @@ func ZjJkxm(c *gin.Context) {
 	}
 	if len(data) == 0 {
 		data = append(data, "终结成功!")
+	}
+	appG.Response(http.StatusOK, e.SUCCESS, data)
+}
+
+// 删除监控项目
+func DelJkxm(c *gin.Context) {
+	var (
+		appG = app.Gin{C: c}
+		form JkxmForm
+	)
+	httpCode, errCode := app.BindAndValid(c, &form)
+	if errCode != e.SUCCESS {
+		appG.Response(httpCode, errCode, nil)
+		return
+	}
+	var data []string
+	for _, id := range form.Id {
+		if err := models.DelJkxm(form.XmDm, id); err != nil {
+			logging.Error(fmt.Sprintf(
+				"Delete Jkxm-[%s] : id-[%s] err:%v", form.XmDm, id, err))
+			data = append(data, fmt.Sprintf("%s - %s err: %v", form.XmDm, id, err))
+			continue
+		}
+	}
+	if len(data) == 0 {
+		data = append(data, "删除成功!")
 	}
 	appG.Response(http.StatusOK, e.SUCCESS, data)
 }

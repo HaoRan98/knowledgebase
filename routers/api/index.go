@@ -20,16 +20,23 @@ func JkxmIndex(c *gin.Context) {
 	}
 }
 
-func KfqZmq1(c *gin.Context) {
+func KfqZmq(c *gin.Context) {
 	if c.Request.Method == "GET" {
-		t, _ := template.ParseFiles("runtime/static_kfqzmq1/index.html")
+		t, _ := template.ParseFiles("runtime/static_kfqzmq/index.html")
 		util.ShowError("template parseFiles err", t.Execute(c.Writer, nil))
 	}
 }
 
-func KfqZmq2(c *gin.Context) {
+func Kfqky(c *gin.Context) {
 	if c.Request.Method == "GET" {
-		t, _ := template.ParseFiles("runtime/static_kfqzmq2/index.html")
+		t, _ := template.ParseFiles("runtime/static_kfqky/index.html")
+		util.ShowError("template parseFiles err", t.Execute(c.Writer, nil))
+	}
+}
+
+func Device(c *gin.Context) {
+	if c.Request.Method == "GET" {
+		t, _ := template.ParseFiles("runtime/static_device/index.html")
 		util.ShowError("template parseFiles err", t.Execute(c.Writer, nil))
 	}
 }

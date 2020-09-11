@@ -43,15 +43,20 @@ func InitRouter() *gin.Engine {
 	r.Static("/jkxm/js", "runtime/static_jkxm/js")
 	r.Static("/jkxm/img", "runtime/static_jkxm/img")
 
-	r.GET("/kfqzmq1", api.KfqZmq1)
-	r.Static("/kfqzmq1/css", "runtime/static_kfqzmq1/css")
-	r.Static("/kfqzmq1/js", "runtime/static_kfqzmq1/js")
-	r.Static("/kfqzmq1/img", "runtime/static_kfqzmq1/img")
+	r.GET("/kfqzmq", api.KfqZmq)
+	r.Static("/kfqzmq/css", "runtime/static_kfqzmq/css")
+	r.Static("/kfqzmq/js", "runtime/static_kfqzmq/js")
+	r.Static("/kfqzmq/img", "runtime/static_kfqzmq/img")
 
-	r.GET("/kfqzmq2", api.KfqZmq2)
-	r.Static("/kfqzmq2/css", "runtime/static_kfqzmq2/css")
-	r.Static("/kfqzmq2/js", "runtime/static_kfqzmq2/js")
-	r.Static("/kfqzmq2/img", "runtime/static_kfqzmq2/img")
+	r.GET("/kfqky", api.Kfqky)
+	r.Static("/kfqky/css", "runtime/static_kfqky/css")
+	r.Static("/kfqky/js", "runtime/static_kfqky/js")
+	r.Static("/kfqky/img", "runtime/static_kfqky/img")
+
+	r.GET("/device", api.Device)
+	r.Static("/device/css", "runtime/static_device/css")
+	r.Static("/device/js", "runtime/static_device/js")
+	r.Static("/device/img", "runtime/static_device/img")
 
 	r.POST("/login", v1.Login)
 	r.GET("/ws", v1.Websocket(mr))
@@ -149,6 +154,8 @@ func InitRouter() *gin.Engine {
 		apiv2.POST("/jkxm/zj", v2.ZjJkxm)
 		// 监控项目终结审核
 		apiv2.POST("/jkxm/zjsh", v2.ShJkxm)
+		// 删除监控项目
+		apiv2.POST("/jkxm/del", v2.DelJkxm)
 		// 根据终结标志获取对应项目列表
 		apiv2.GET("/jkxm/listzj", v2.GetJkxmByZjbz)
 		// 根据审核标志获取对应项目列表(终结审核)

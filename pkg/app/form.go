@@ -15,10 +15,10 @@ func BindAndValid(c *gin.Context, form interface{}) (int, int) {
 	err := c.Bind(form)
 	if err != nil {
 		logging.Error("BIND:%v", err)
-		logging.Debug(fmt.Sprintf("%+v", form))
 		return http.StatusBadRequest, e.INVALID_PARSE_FORM
 	}
 
+	logging.Debug(fmt.Sprintf("%+v", form))
 	valid := validation.Validation{}
 	check, err := valid.Valid(form)
 	if err != nil {

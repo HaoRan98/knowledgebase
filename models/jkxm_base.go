@@ -68,7 +68,7 @@ func ZjJkxm(tName, id string, zjMap map[string]string) error {
 }
 
 func DelJkxm(tName, id string) error {
-	sql := fmt.Sprintf("delete from %s where id=%s", tName, id)
+	sql := fmt.Sprintf("delete from %s where id='%s'", tName, id)
 	if err := db.Exec(sql).Error; err != nil {
 		return err
 	}

@@ -1,6 +1,6 @@
 package util
 
-import "github.com/labstack/gommon/log"
+import "log"
 
 func ShowError(where string, err error) {
 	if err != nil {

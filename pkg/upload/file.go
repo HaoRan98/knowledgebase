@@ -10,10 +10,10 @@ import (
 	"strings"
 	"time"
 
-	"NULL/knowledgebase/pkg/file"
-	"NULL/knowledgebase/pkg/logging"
-	"NULL/knowledgebase/pkg/setting"
-	"NULL/knowledgebase/pkg/util"
+	"knowledgebase/pkg/file"
+	"knowledgebase/pkg/logging"
+	"knowledgebase/pkg/setting"
+	"knowledgebase/pkg/util"
 )
 
 // GetFileFullUrl get the full access path
@@ -61,7 +61,7 @@ func CheckFileSize(f multipart.File) bool {
 		return false
 	}
 
-	return size <= setting.AppSetting.FileMaxSize
+	return int64(size) <= (int64(setting.AppSetting.FileMaxSize) << 20)
 }
 
 // CheckFile check if the file exists

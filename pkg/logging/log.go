@@ -2,7 +2,7 @@ package logging
 
 import (
 	"fmt"
-	"NULL/knowledgebase/pkg/file"
+	"knowledgebase/pkg/file"
 	"log"
 	"os"
 	"path/filepath"

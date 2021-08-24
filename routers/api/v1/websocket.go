@@ -1,11 +1,11 @@
 package v1
 
 import (
-	"NULL/knowledgebase/models"
-	"NULL/knowledgebase/pkg/util"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"gopkg.in/olahol/melody.v1"
+	"knowledgebase/models"
+	"knowledgebase/pkg/util"
 	"log"
 	"sync"
 )
@@ -40,6 +40,10 @@ func Websocket(mr *melody.Melody) gin.HandlerFunc {
 		var wsMsg = WsMsg{}
 		log.Printf("rec: %v", string(msg))
 		util.ShowError("", json.Unmarshal(msg, &wsMsg))
+		//log.Println("wsmsg.token",wsMsg.Token)
+		//log.Println("wsmsg.my_type",wsMsg.MsType)
+		//log.Println("wsmsg.message",wsMsg.Message)
+		//log.Println("wsmsg.data",wsMsg.Data)
 		if util.GetLoginID(wsMsg.Token, nil) == "" {
 			msg := WsMsg{
 				MsType: "check",
@@ -57,7 +61,7 @@ func Websocket(mr *melody.Melody) gin.HandlerFunc {
 		case "hello":
 			var u = &models.SysUser{}
 			util.ShowError("", util.FormJson(wsMsg.Message, &u))
-			log.Println(u)
+			log.Println("u  :", u)
 			Clients.Store(session, u)
 			BroadCastOnline()
 			BroadCastTopic()
@@ -144,13 +148,13 @@ func BroadCastOnline() {
 
 // 发帖或修改帖子后,向所有人广播新帖子列表
 func BroadCastTopic() {
-	topics, err := models.GetTopics("", "", 1, 10)
+	topics, err := models.GetTopics("", "", "", 1, 10)
 	if err != nil {
 		log.Printf("send topic msg err\n ERR:%v", err)
 		return
 	}
 	Clients.Range(func(s, u interface{}) bool {
-		tpResps := make([]TpResp, 0)
+		tpResps := make([]TpResp1, 0)
 		for _, topic := range topics {
 			loginId := u.(*models.SysUser).UserAccount
 			replyResps := make([]*RpResp, 0)
@@ -161,7 +165,7 @@ func BroadCastTopic() {
 			}
 			tpFlag := models.IsAgreed(topic.ID, loginId)
 			favFlag := models.IsFavorite(topic.ID, loginId)
-			tpResps = append(tpResps, TpResp{
+			tpResps = append(tpResps, TpResp1{
 				Topic: topic, Replys: replyResps, Agreed: tpFlag, Faved: favFlag})
 		}
 		resp := map[string]interface{}{

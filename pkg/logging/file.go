@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"NULL/knowledgebase/pkg/setting"
+	"knowledgebase/pkg/setting"
 )
 
 // getLogFilePath get the log file save path

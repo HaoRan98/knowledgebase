@@ -1,14 +1,13 @@
 package main
 
 import (
-	"NULL/knowledgebase/models"
-	"NULL/knowledgebase/pkg/cron"
-	"NULL/knowledgebase/pkg/logging"
-	"NULL/knowledgebase/pkg/setting"
-	"NULL/knowledgebase/pkg/util"
-	"NULL/knowledgebase/routers"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"knowledgebase/models"
+	"knowledgebase/pkg/logging"
+	"knowledgebase/pkg/setting"
+	"knowledgebase/pkg/util"
+	"knowledgebase/routers"
 	"log"
 	"net/http"
 	"os"
@@ -18,21 +17,24 @@ import (
 )
 
 func init() {
+	//nobug.Nobug()
 	setting.Setup()
 	logging.Setup()
 	util.Setup()
 	models.Setup()
-	cron.Setup()
+	//cron.Setup()
 }
 
+// @title Swagger Example API
+// @version 0.0.1
+// @description This is a sample Server pets
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name x-token
+// @host http://127.0.0.1
+// @BasePath /
 func main() {
 	gin.SetMode(setting.ServerSetting.RunMode)
-	if len(os.Args) == 2 {
-		models.InitDb()
-		log.Println("*******init browse info over*****")
-		log.Println("*******please rerun the program*****")
-		return
-	}
 
 	routersInit := routers.InitRouter()
 	readTimeout := setting.ServerSetting.ReadTimeout

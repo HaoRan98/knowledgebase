@@ -8,18 +8,21 @@ import (
 
 //回帖
 type Reply struct {
-	ID        string     `json:"id" gorm:"primary_key"`
-	DeletedAt *time.Time `sql:"index"`
-	TopicID   string     `json:"topic_id"`
-	Floor     int        `json:"floor" gorm:"COMMENT:'楼层'"`
-	Content   string     `json:"content" gorm:"COMMENT:'回帖内容';size:65535"`
-	Author    string     `json:"author"`
-	Account   string     `json:"account"`
-	Deptname  string     `json:"deptname"`
-	Uptime    string     `json:"uptime"`
-	Agree     int        `json:"agree" gorm:"COMMENT:'赞同数';default:'0'"`
-	Accept    bool       `json:"accept" gorm:"COMMENT:'采纳标志';default:'0'"`
-	Comments  []Comment
+	ID         string     `json:"id" gorm:"primary_key"`
+	DeletedAt  *time.Time `sql:"index"`
+	TopicID    string     `json:"topic_id"`
+	Floor      int        `json:"floor" gorm:"COMMENT:'楼层'"`
+	Content    string     `json:"content" gorm:"COMMENT:'回帖内容';size:65535"`
+	Author     string     `json:"author"`
+	Account    string     `json:"account"`
+	Deptname   string     `json:"deptname"`
+	JGDM       string     `json:"jgdm"`
+	JGMC       string     `json:"jgmc"`
+	Createtime string     `json:"createtime"`
+	Uptime     string     `json:"uptime"`
+	Agree      int        `json:"agree" gorm:"COMMENT:'赞同数';default:'0'"`
+	Accept     bool       `json:"accept" gorm:"COMMENT:'采纳标志';default:'0'"`
+	Comments   []Comment
 }
 
 func CreateReply(data interface{}) error {
@@ -67,6 +70,7 @@ func RemoveReplyAgree(id string) error {
 	}
 	return nil
 }
+
 func DelReply(id string) error {
 	tx := db.Begin()
 	defer func() {
@@ -90,6 +94,7 @@ func DelReply(id string) error {
 	}
 	return tx.Commit().Error
 }
+
 func GetReplies(topicId string, pageNo, pageSize int) ([]*Reply, error) {
 	var replies []*Reply
 	if err := db.
@@ -109,6 +114,56 @@ func GetReplies(topicId string, pageNo, pageSize int) ([]*Reply, error) {
 func GetRepliesCnt(topicId string) (cnt int) {
 	if err := db.Table("reply").
 		Where("topic_id like ?", "%"+topicId+"%").Count(&cnt).Error; err != nil {
+		cnt = 0
+	}
+	return cnt
+}
+
+func DeleteReply(topic_id string) error {
+	tx := db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+	if tx.Error != nil {
+		tx.Rollback()
+		return tx.Error
+	}
+	if err := tx.Table("reply").
+		Where("topic_id=?", topic_id).Delete(Reply{}).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+	if err := tx.Table("comment").
+		Where("topic_id=?", topic_id).Delete(Comment{}).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+	return tx.Commit().Error
+}
+
+func ComGetReplies(account string, pageNo, pageSize int) ([]*Reply, error) {
+	var replies []*Reply
+	if err := db.Debug().
+		Preload("Comments", func(db *gorm.DB) *gorm.DB {
+			return db.Order("comment.floor")
+		}).
+		Where("account = ?", account).
+		Where("deleted_at is null").
+		Order("accept desc,agree desc,uptime desc").
+		Limit(pageSize).Offset(pageSize * (pageNo - 1)).Find(&replies).Error; err != nil {
+		return nil, err
+	}
+	if len(replies) > 0 {
+		return replies, nil
+	}
+	return nil, nil
+}
+
+func GetAccountRepliesCnt(account string) (cnt int) {
+	if err := db.Table("reply").
+		Where("account=?", account).Count(&cnt).Error; err != nil {
 		cnt = 0
 	}
 	return cnt

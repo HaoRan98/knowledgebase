@@ -1,7 +1,7 @@
 package util
 
 import (
-	"NULL/knowledgebase/pkg/setting"
+	"knowledgebase/pkg/setting"
 )
 
 // Setup Initialize the util

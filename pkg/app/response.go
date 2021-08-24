@@ -3,7 +3,7 @@ package app
 import (
 	"github.com/gin-gonic/gin"
 
-	"NULL/knowledgebase/pkg/e"
+	"knowledgebase/pkg/e"
 )
 
 type Gin struct {

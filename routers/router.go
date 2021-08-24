@@ -1,19 +1,23 @@
 package routers
 
 import (
-	"NULL/knowledgebase/middleware/cors"
-	"NULL/knowledgebase/middleware/jwt"
-	"NULL/knowledgebase/pkg/export"
-	"NULL/knowledgebase/pkg/qrcode"
-	"NULL/knowledgebase/pkg/upload"
-	"NULL/knowledgebase/routers/api"
-	v1 "NULL/knowledgebase/routers/api/v1"
-	v2 "NULL/knowledgebase/routers/api/v2"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	"github.com/swaggo/gin-swagger/swaggerFiles"
 	"gopkg.in/olahol/melody.v1"
+	_ "knowledgebase/docs"
+	"knowledgebase/middleware/cors"
+	"knowledgebase/middleware/jwt"
+	"knowledgebase/pkg/export"
+	"knowledgebase/pkg/qrcode"
+	"knowledgebase/pkg/upload"
+	"knowledgebase/routers/api"
+	v1 "knowledgebase/routers/api/v1"
+	"log"
 	"net/http"
+	"time"
 )
 
 // InitRouter initialize routing information
@@ -22,6 +26,7 @@ func InitRouter() *gin.Engine {
 
 	store := cookie.NewStore([]byte("secret"))
 	r.Use(sessions.Sessions("mysession", store))
+	//r.MaxMultipartMemory = int64(setting.AppSetting.FileMaxSize) << 20
 
 	var mr = melody.New()
 	mr.Config.MaxMessageSize = 40960 * 2
@@ -32,33 +37,16 @@ func InitRouter() *gin.Engine {
 	r.StaticFS("/export", http.Dir(export.GetExcelFullPath()))
 	r.StaticFS("/qrcode", http.Dir(qrcode.GetQrCodeFullPath()))
 
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
 	r.GET("/", api.KlibIndex)
 	r.GET("/klib", api.KlibIndex)
 	r.Static("/css", "runtime/static/css")
 	r.Static("/js", "runtime/static/js")
 	r.Static("/img", "runtime/static/img")
 
-	r.GET("/sjzt", api.JkxmIndex)
-	r.Static("/jkxm/css", "runtime/static_jkxm/css")
-	r.Static("/jkxm/js", "runtime/static_jkxm/js")
-	r.Static("/jkxm/img", "runtime/static_jkxm/img")
-
-	r.GET("/kfqzmq", api.KfqZmq)
-	r.Static("/kfqzmq/css", "runtime/static_kfqzmq/css")
-	r.Static("/kfqzmq/js", "runtime/static_kfqzmq/js")
-	r.Static("/kfqzmq/img", "runtime/static_kfqzmq/img")
-
-	r.GET("/kfqky", api.Kfqky)
-	r.Static("/kfqky/css", "runtime/static_kfqky/css")
-	r.Static("/kfqky/js", "runtime/static_kfqky/js")
-	r.Static("/kfqky/img", "runtime/static_kfqky/img")
-
-	r.GET("/device", api.Device)
-	r.Static("/device/css", "runtime/static_device/css")
-	r.Static("/device/js", "runtime/static_device/js")
-	r.Static("/device/img", "runtime/static_device/img")
-
 	r.POST("/login", v1.Login)
+	//r.POST("/login", v1.Login1)
 	r.GET("/ws", v1.Websocket(mr))
 	r.POST("/topic/imp", v1.ImpTopic)
 
@@ -66,140 +54,147 @@ func InitRouter() *gin.Engine {
 	r.POST("/r_login", v1.Rlogin)
 	r.GET("/r_route", v1.GetRoutes)
 
+	// 智慧平台直接登陆
+	r.POST("zhpt_login", v1.Zhpt_login)
+
 	apiv1 := r.Group("/api/v1")
 	apiv1.Use(jwt.JWT())
 	{
-		//上传文件
+		// 上传文件
 		apiv1.POST("/file/upload", api.UploadFile)
-		//文件下载
+		// 文件下载
 		apiv1.StaticFS("/file/download", http.Dir(upload.GetFileFullPath()))
+		// 删除附件
+		apiv1.POST("/file/delete", api.DeleteFile)
+		// 获取附件列表
+		apiv1.POST("/files", api.GetFiles)
 
-		//发帖
+		// 发帖
 		apiv1.POST("/topic/post", v1.PostTopic)
-		//修改帖子内容
+		// 修改帖子内容
 		apiv1.POST("/topic/edit", v1.EditTopic)
-		//获取帖子详情
-		apiv1.GET("/topic/detail/:id", v1.GetTopic)
-		//获取帖子列表
+		// 获取帖子详情
+		apiv1.POST("/topic/detail", v1.GetTopic)
+		// 获取帖子列表
 		apiv1.GET("/topics", v1.GetTopics)
-		//置顶帖子
-		apiv1.GET("/topic/top/:id", v1.TopTopic)
-		//设置热门帖子
+		// 置顶帖子
+		apiv1.POST("/topic/top", v1.TopTopic)
+		// 设置热门帖子
 		apiv1.GET("/topic/hot/:id", v1.HotTopic)
-		//删除帖子
+		// 点赞帖子
+		apiv1.GET("/topic/agree", v1.TopicAgree)
+		// 取消点赞
+		apiv1.GET("/topic/agree_cancel", v1.RemoveTopicAgree)
+		// 删除帖子
 		apiv1.GET("/topic/del/:id", v1.DelTopic)
+		// 恢复帖子
+		apiv1.POST("/topic/recovery", v1.RecTopic)
+		// 查询删除帖子
+		apiv1.POST("/topic/queryDel", v1.QueryDel)
+		// 删除帖子 真
+		apiv1.POST("/topic/delete", v1.DelTopic_zhen)
+		// 查询机关单位帖子
+		apiv1.POST("/topic/query", v1.QueryTopic)
+		// 机关排名
+		apiv1.POST("/topic/rank/dept", v1.Topic_dept_Rank)
+		// 人员排名
+		apiv1.POST("/topic/rank/user", v1.Topic_user_Rank)
+		// 我的回帖和评论
+		apiv1.POST("/repcom/lists", v1.GetRepCom)
 
-		//收藏帖子
+		// 收藏帖子
 		apiv1.GET("/favorite/add", v1.AddFavorite)
-		//取消收藏帖子
+		// 取消收藏帖子
 		apiv1.GET("/favorite/cancel", v1.CancelFavorite)
-		//获取收藏列表
+		// 获取收藏列表
 		apiv1.GET("/favorites", v1.GetFavorites)
-		//删除收藏
+		// 删除收藏
 		apiv1.GET("/favorite/del/:id", v1.DelFavorite)
 
-		//获取通知列表
+		// 获取通知列表
 		apiv1.GET("/notices", v1.GetNotices)
-		//删除通知
+		// 删除通知
 		apiv1.GET("/notice/del/:id", v1.DelNotice)
 
-		//获取分类列表
+		// 获取分类列表
 		apiv1.GET("/kinds", v1.GetKinds)
-		//删除分类
-		apiv1.GET("/kind/del/:id", v1.DelKind)
+		// 删除分类
+		apiv1.POST("/kind/delete", v1.DelKind)
+		// 修改分类
+		apiv1.POST("/kind/edit", v1.EditKinds)
+		// 获取全部分类
+		apiv1.GET("/kind/list", v1.GetKinds_zong)
 
-		//回帖
+		// 回帖
 		apiv1.POST("/reply/post", v1.PostReply)
-		//修改回帖内容
+		// 修改回帖内容
 		apiv1.POST("/reply/edit", v1.EditReply)
-		//获取回帖列表
+		// 获取回帖列表
 		apiv1.GET("/replies", v1.GetReplies)
-		//采纳回帖
+		// 采纳回帖
 		apiv1.GET("/reply/accept/:id", v1.AcceptReply)
-		//点赞回帖
+		// 点赞回帖
 		apiv1.GET("/reply/agree/:id", v1.ReplyAgree)
-		//取消点赞回帖
+		// 取消点赞回帖
 		apiv1.GET("/reply/agree_cancel/:id", v1.RemoveReplyAgree)
-		//删除回帖
+		// 删除回帖
 		apiv1.GET("/reply/del/:id", v1.DelReply)
 
-		//发布评论
+		// 发布评论
 		apiv1.POST("/comment/post", v1.PostComment)
-		//修改评论内容
+		// 修改评论内容
 		apiv1.POST("/comment/edit", v1.EditComment)
-		//获取回帖列表
+		// 获取评论列表
 		apiv1.GET("/comments", v1.GetComments)
-		//点赞评论
+		// 点赞评论
 		apiv1.GET("/comment/agree/:id", v1.CommentAgree)
-		//取消点赞评论
+		// 取消点赞评论
 		apiv1.GET("/comment/agree_cancel/:id", v1.RemoveCommentAgree)
-		//删除评论
+		// 删除评论
 		apiv1.GET("/comment/del/:id", v1.DelComment)
+
+		// 发布标签
+		apiv1.POST("/label/post", v1.PostLabel)
+		// 修改标签
+		apiv1.POST("/label/edit", v1.EditLabel)
+		// 获取标签列表
+		apiv1.GET("/labels", v1.GetLabels)
+		// 点赞标签
+		apiv1.GET("/label/agree/", v1.LabelAgree)
+		// 取消点赞标签
+		apiv1.GET("/label/agree_cancel/", v1.RemoveLabelAgree)
+		// 删除标签
+		apiv1.GET("/label/del/", v1.DelLabel)
+
+		// 获取人员列表
+		apiv1.POST("/userinfo/", v1.GetUserList)
+		// 创建团队
+		apiv1.POST("/group/create", v1.CreateGroup)
+		// 修改团队
+		apiv1.POST("/group/edit", v1.EditGroup)
+		// 获取团队列表
+		apiv1.POST("/group/groups", v1.GetGroups)
+		// 我创建的团队
+		apiv1.POST("/group/mygroups", v1.MyGroups)
+		// 删除团队
+		apiv1.POST("/group/del", v1.DelGroup)
+		// 查询团队
+		apiv1.POST("/group/select", v1.SeleteGroup)
+
+		// 添加成员
+		apiv1.POST("/member/add", v1.AddMember)
+		// 获取团队成员列表
+		apiv1.POST("/member/list", v1.GetMembers)
+		// 退出团队
+		apiv1.POST("/member/dropout", v1.DropOut)
+
 	}
 
-	apiv2 := r.Group("/api/v2")
-	apiv2.Use(jwt.JWT())
-	{
-		// 获取用户信息,存入session
-		apiv2.POST("/jkxm/userinfo", v1.UserInfo)
-		// 获取纳税人信息
-		apiv2.GET("/jkxm/nsrmc", v1.NsrInfo)
-		// 导入监控项目
-		apiv2.POST("/jkxm/imp", v2.ImpJkxm)
-		// 监控项目录入审核
-		apiv2.POST("/jkxm/lrsh", v2.ShJkxm)
-		// 根据审核标志获取对应项目列表(录入审核)
-		apiv2.GET("/jkxm/listlrsh", v2.GetJkxmByShbz)
-		// 终结监控项目
-		apiv2.POST("/jkxm/zj", v2.ZjJkxm)
-		// 监控项目终结审核
-		apiv2.POST("/jkxm/zjsh", v2.ShJkxm)
-		// 删除监控项目
-		apiv2.POST("/jkxm/del", v2.DelJkxm)
-		// 根据终结标志获取对应项目列表
-		apiv2.GET("/jkxm/listzj", v2.GetJkxmByZjbz)
-		// 根据审核标志获取对应项目列表(终结审核)
-		apiv2.GET("/jkxm/listzjsh", v2.GetJkxmByShbz)
-		// 下载根据审核标志获取对应项目列表(终结审核)
-		apiv2.GET("/jkxm/dlycxx", v2.DownloadJkxmByShbz)
-		// 风险发票超XX份、税额超XX万元的企业名单
-		apiv2.GET("/jkxm/fxfp", v2.GetJkxmFxfp)
-		// 获取风险发票明细
-		apiv2.GET("/jkxm/fxfpmx", v2.GetJkxmFxfpByNsrsbh)
-		// 下载风险发票明细
-		apiv2.GET("/jkxm/dlfxfpmx", v2.DownloadJkxmFxfp)
-
-		// 即办注销监控项目
-		apiv2.POST("/jkxm/jbzx", v2.JbzxJkxm)
-		// 统计工作量
-		apiv2.GET("/jkxm/workload", v2.CountWorkload)
-		// 汇总所有监控项目异常数量
-		apiv2.GET("/jkxms/count", v2.CountJkxms)
-		// 获取所有监控项目异常总数量
-		apiv2.GET("/jkxms/total", v2.GetJkxmsTotal)
-		// 获取所有监控项目异常(已经解除疑点)数量
-		apiv2.GET("/jkxms/resolve", v2.GetJkxmsResolve)
-		// 获取所有监控项目异常(未终结审核)数量/尚未解除的疑点数量
-		apiv2.GET("/jkxms/unsolved", v2.GetJkxmsUnsolved)
-		// 成果统计
-		apiv2.GET("/jkxm/zxtj", v2.Zxtj)
-		// 确认启动即办注销流程户数明细
-		apiv2.GET("/jkxm/jbzxmx", v2.JbzxJkxmMx)
-		// 金三即办注销户数明细
-		apiv2.GET("/jkxm/gt3mx", v2.JbzxGT3Mx)
-		// 注销运行情况监控
-		apiv2.GET("/jkxm/zxqkjk", v2.Zxqkjk)
-		// 下载确认启动即办注销流程名单
-		apiv2.GET("/jkxm/dljbzxmx", v2.DownloadJbzxJkxmMx)
-		// 下载金三即办注销流程名单
-		apiv2.GET("/jkxm/dlgt3mx", v2.DownloadGT3Mx)
-		// 下载注销运行情况监控名单
-		apiv2.GET("/jkxm/dlzxqkjk", v2.DownloadZxqkjk)
-
-		// 手动同步后台监控指标
-		apiv2.GET("/jkxm/sync", v2.SyncJkxm)
-		// 获取监控项目名称代码
-		apiv2.GET("/jkxm/mcdm", v2.GetJkxmMcdms)
-	}
+	// 保证文本顺序输出
+	go func() {
+		time.Sleep(100 * time.Millisecond)
+		// In order to ensure that the text order output can be deleted
+		log.Println(`默认自动化文档地址:http://127.0.0.1:80/swagger/index.html`)
+	}()
 	return r
 }

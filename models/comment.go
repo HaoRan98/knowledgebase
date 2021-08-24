@@ -8,17 +8,23 @@ import (
 
 //评论回帖
 type Comment struct {
-	ID        string     `json:"id" gorm:"primary_key"`
-	DeletedAt *time.Time `sql:"index"`
-	TopicID   string     `json:"topic_id"`
-	ReplyID   string     `json:"reply_id"`
-	Floor     int        `json:"floor" gorm:"COMMENT:'楼层'"`
-	Content   string     `json:"content" gorm:"COMMENT:'评论内容';size:65535"`
-	Author    string     `json:"author"`
-	Account   string     `json:"account"`
-	Deptname  string     `json:"deptname"`
-	Uptime    string     `json:"uptime"`
-	Agree     int        `json:"agree" gorm:"COMMENT:'赞同数';default:'0'"`
+	ID         string     `json:"id" gorm:"primary_key"`
+	DeletedAt  *time.Time `sql:"index"`
+	TopicID    string     `json:"topic_id"`
+	ReplyID    string     `json:"reply_id"`
+	Floor      int        `json:"floor" gorm:"COMMENT:'楼层'"`
+	Content    string     `json:"content" gorm:"COMMENT:'评论内容';size:65535"`
+	Author     string     `json:"author"`
+	Account    string     `json:"account"`
+	ToAccount  string     `json:"to_account"`
+	ToDeptname string     `json:"to_deptname"`
+	ToAuthor   string     `json:"to_author"`
+	Deptname   string     `json:"deptname"`
+	Createtime string     `json:"createtime"`
+	Uptime     string     `json:"uptime"`
+	Agree      int        `json:"agree" gorm:"COMMENT:'赞同数';default:'0'"`
+	JGDM       string     `json:"jgdm"`
+	JGMC       string     `json:"jgmc"`
 }
 
 func CreateComment(data interface{}) error {
@@ -27,6 +33,7 @@ func CreateComment(data interface{}) error {
 	}
 	return nil
 }
+
 func GenCommentFloor(replyId string) (int, error) {
 	var comment Comment
 	err := db.Where("reply_id=?", replyId).Order("floor desc").
@@ -88,6 +95,29 @@ func GetComments(replyId string, pageNo, pageSize int) ([]*Comment, error) {
 func GetCommentsCnt(replyId string) (cnt int) {
 	if err := db.Table("comment").
 		Where("reply_id like ?", "%"+replyId+"%").Count(&cnt).Error; err != nil {
+		cnt = 0
+	}
+	return cnt
+}
+
+func RepGetComments(account string, pageNo, pageSize int) ([]*Comment, error) {
+	var comments []*Comment
+	if err := db.Debug().
+		Where("account = ?", account).
+		Where("deleted_at is null").
+		Order("agree desc,uptime desc").
+		Limit(pageSize).Offset(pageSize * (pageNo - 1)).Find(&comments).Error; err != nil {
+		return nil, err
+	}
+	if len(comments) > 0 {
+		return comments, nil
+	}
+	return nil, nil
+}
+
+func GetCommentCnt(account string) (cnt int) {
+	if err := db.Table("comment").
+		Where("account=?", account).Count(&cnt).Error; err != nil {
 		cnt = 0
 	}
 	return cnt

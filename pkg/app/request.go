@@ -3,7 +3,7 @@ package app
 import (
 	"github.com/astaxie/beego/validation"
 
-	"NULL/knowledgebase/pkg/logging"
+	"knowledgebase/pkg/logging"
 )
 
 // MarkErrors logs error logs

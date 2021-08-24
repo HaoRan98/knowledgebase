@@ -1,11 +1,11 @@
 package v1
 
 import (
-	"NULL/knowledgebase/models"
-	"NULL/knowledgebase/pkg/app"
-	"NULL/knowledgebase/pkg/e"
-	"NULL/knowledgebase/pkg/util"
 	"github.com/gin-gonic/gin"
+	"knowledgebase/models"
+	"knowledgebase/pkg/app"
+	"knowledgebase/pkg/e"
+	"knowledgebase/pkg/util"
 	"log"
 	"net/http"
 	"strconv"
@@ -20,11 +20,19 @@ type CommentForm struct {
 	Author   string `json:"author"`
 	Account  string `json:"account"`
 	Deptname string `json:"deptname"`
+	JGDM     string `json:"jgdm"`
+	JGMC     string `json:"jgmc"`
 }
 
 type CtResp struct {
 	*models.Comment
 	Agreed bool `json:"agreed"`
+}
+
+type CtResp1 struct {
+	*models.Comment
+	Kind  string `json:"kind"`
+	Title string `json:"title"`
 }
 
 func PostComment(c *gin.Context) {
@@ -48,20 +56,37 @@ func PostComment(c *gin.Context) {
 		appG.Response(http.StatusInternalServerError, e.ERROR, err)
 		return
 	}
+
+	// 调用.5接口 获取人员信息
+
 	t := time.Now().Format("2006-01-02 15:04:05")
 	comment := &models.Comment{
-		ID:       "CMT-" + util.RandomString(28),
-		TopicID:  reply.TopicID,
-		ReplyID:  form.ReplyID,
-		Content:  form.Content,
-		Author:   form.Author,
-		Account:  form.Account,
-		Deptname: form.Deptname,
-		Floor:    floor,
-		Uptime:   t,
+		ID:         "CMT-" + util.RandomString(28),
+		TopicID:    reply.TopicID,
+		ReplyID:    form.ReplyID,
+		Content:    form.Content,
+		Author:     form.Author,
+		Account:    form.Account,
+		Deptname:   form.Deptname,
+		Floor:      floor,
+		Createtime: t,
+		Uptime:     t,
+		JGDM:       form.JGDM,
+		JGMC:       form.JGMC,
 	}
 	if err := models.CreateComment(comment); err != nil {
 		appG.Response(http.StatusInternalServerError, e.ERROR, err)
+		return
+	}
+
+	// 更新帖子回复时间
+	topicmap := map[string]interface{}{
+		"uptime":       t,
+		"last_publish": form.Author,
+		"id":           reply.TopicID,
+	}
+	if err := models.EditTopic1(topicmap); err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR, "更新回帖时间失败")
 		return
 	}
 
@@ -242,5 +267,14 @@ func DelComment(c *gin.Context) {
 		appG.Response(http.StatusInternalServerError, e.ERROR, err)
 		return
 	}
+
+	var index = "comment"
+	errMsg := models.ESDeleteSingle(index, id)
+	if errMsg != nil {
+		log.Println("EsDeleteSingle err:", errMsg)
+	} else {
+		log.Println("EsDeleteSingle: ok")
+	}
+
 	appG.Response(http.StatusOK, e.SUCCESS, nil)
 }

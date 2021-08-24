@@ -23,6 +23,8 @@ var MsgFlags = map[int]string{
 
 	ERROR_GET_DEPARTMENT_FAIL: "获取部门列表失败",
 	ERROR_GET_USER_FAIL:       "获取部门用户列表失败",
+	AUTO_LOGIN_ERROR:          "自动失败,平台登录超时",
+	Select_ERROR:              "查找团队失败",
 }
 
 // GetMsg get error information based on Code

@@ -1,9 +1,9 @@
 package api
 
 import (
-	"NULL/knowledgebase/pkg/util"
 	"github.com/gin-gonic/gin"
 	"html/template"
+	"knowledgebase/pkg/util"
 )
 
 func KlibIndex(c *gin.Context) {

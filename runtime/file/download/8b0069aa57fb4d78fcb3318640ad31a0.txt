@@ -1,0 +1,88 @@
+首先 有限公司 不要了
+
+查一下计算相似度，用到XX向量
+
+********************************************************************
+
+①输入一句话，将其当做查询语句
+
+②jieba分词，将这句话分好词，查询SQL一句 例如 
+
+	语句 	  烟台市莱山区（地点）
+	 	  上一季度（时间） 
+	   	  某公司（公司名）/        开具xx票（票种）
+	  	  多少元                 /        票数
+
+③通过词库分类，这句话中分出来的词进行相似度计算，分别对各种map进行相似度对比，
+   再生成sql语句进行查询
+********************************************************************
+
+grpc 通信，分好词后，计算互信息，再互信息计算完后，每个词类都要有一个具体的范围，
+不一定要一样，根据字数来定，计算完后找到下一层所在机器，进行通信，查找范围内是否含有
+包含当前字符串的词，
+
+
+**************************************************************************
+
+两个文本，烟台市 招远市 两个的向量都是（1,1,1），把他们两个弄成一个多维向量，
+
+**************************************************************************
+
+也就是说，要有所有该商贸公司进货清单，还要有卖出清单，数据：(有向图)
+H-->G
+G-->H
+、
+如果是个无向图，进货了这么多，只要知道这条边存不存在即可，
+
+
+-i https://mirror.baidu.com/pypi/simple
+
+
+##########
+腾讯云
+ssh ubuntu@129.211.114.37
+gen91!@Inue
+
+跳
+ssh alphis@221.0.76.170 -p 2550
+alphis37$&
+
+
+
+"data": {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiZXhwIjoxNjQyNTYxODk1LCJpc3MiOiJkaW5ndGFsayJ9.UC6R3VVRDH7lfxaKHWw_9btJFawNHUyYnpravntT3dI",
+        "useraccount": "admin",
+        "username": "lhr"，
+      “version”：{
+	flag：0，
+	name：“试用版",
+        }
+    }
+
+
+
+A,B--->服务器
+海康golang
+截图
+指纹仪（打卡鉴权）
+面部识别
+webrtc pion
+
+ invalid proposed signaling state transition:
+invalid proposed signaling state transition
+
+运维：标签
+
+E9F0DC
+
+
+func AgreeBool(id , account string) (*Label,error) {
+
+	var label Label
+	if err := db.Table("agree").Where("id=?", id).Where("account = ?",account).First(&label).Error; err != nil {
+		return nil , err
+	}
+
+	return &label , nil
+
+}

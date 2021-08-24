@@ -112,3 +112,20 @@ func FindFilesOlderThanDate(dir string, overDate int) (files []os.FileInfo, err 
 	}
 	return files, nil
 }
+
+// 删除文件
+func RemoveFile(file string) (bool, error) {
+
+	err := os.Remove("./" + file) //删除文件test.txt
+	if err != nil {
+		//如果删除失败则输出 file remove Error!
+		fmt.Println("file remove Error!")
+		//输出错误详细信息
+		fmt.Printf("%s", err)
+		return false, err
+	} else {
+		//如果删除成功则输出 file remove OK!
+		fmt.Print("file remove OK!")
+		return true, nil
+	}
+}

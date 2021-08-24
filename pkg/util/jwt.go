@@ -12,16 +12,18 @@ var jwtSecret []byte
 
 type CustomClaims struct {
 	Username string `json:"username"`
+	DeptID   string `json:"dept_id"`
 	jwt.StandardClaims
 }
 
 // GenerateToken generate tokens used for auth
-func GenerateToken(username, password string) (string, error) {
+func GenerateToken(username, dept_id string) (string, error) {
 	nowTime := time.Now()
 	expireTime := nowTime.Add(330 * 24 * time.Hour)
 
 	claims := CustomClaims{
 		username,
+		dept_id,
 		jwt.StandardClaims{
 			ExpiresAt: expireTime.Unix(),
 			Issuer:    "dingtalk",
@@ -42,6 +44,8 @@ func ParseToken(token string) (interface{}, error) {
 		}
 		return jwtSecret, nil
 	})
+
+	//log.Println("jwt:",tokenClaims)
 	if tokenClaims != nil {
 		if claims, ok := tokenClaims.Claims.(jwt.MapClaims); ok {
 			if tokenClaims.Valid {
@@ -68,4 +72,17 @@ func GetLoginID(token string, c *gin.Context) string {
 	}
 	claims, _ := ParseToken(token)
 	return claims.(jwt.MapClaims)["username"].(string)
+}
+
+func GetDeptID(token string, c *gin.Context) string {
+	if token == "" {
+		token = c.GetHeader("X-Access-Token")
+		auth := c.GetHeader("Authorization")
+		//token := c.Query("token")
+		if len(auth) > 0 {
+			token = auth
+		}
+	}
+	claims, _ := ParseToken(token)
+	return claims.(jwt.MapClaims)["dept_id"].(string)
 }

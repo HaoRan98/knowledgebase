@@ -1,11 +1,11 @@
 package app
 
 import (
-	"NULL/knowledgebase/pkg/e"
-	"NULL/knowledgebase/pkg/logging"
 	"fmt"
 	"github.com/astaxie/beego/validation"
 	"github.com/gin-gonic/gin"
+	"knowledgebase/pkg/e"
+	"knowledgebase/pkg/logging"
 	"log"
 	"net/http"
 )

@@ -1,11 +1,11 @@
 package export
 
 import (
-	"NULL/knowledgebase/models"
-	"NULL/knowledgebase/pkg/setting"
-	"NULL/knowledgebase/pkg/upload"
 	"fmt"
 	"github.com/360EntSecGroup-Skylar/excelize"
+	"knowledgebase/models"
+	"knowledgebase/pkg/setting"
+	"knowledgebase/pkg/upload"
 	"strconv"
 	"strings"
 	"time"

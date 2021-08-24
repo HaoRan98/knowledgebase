@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"NULL/knowledgebase/pkg/e"
-	"NULL/knowledgebase/pkg/util"
+	"knowledgebase/pkg/e"
+	"knowledgebase/pkg/util"
 )
 
 // JWT is jwt middleware

@@ -1,9 +1,9 @@
 package models
 
 import (
-	"NULL/knowledgebase/pkg/setting"
 	"github.com/360EntSecGroup-Skylar/excelize"
 	"github.com/jinzhu/gorm"
+	"knowledgebase/pkg/setting"
 	"log"
 )
 

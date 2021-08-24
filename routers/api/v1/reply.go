@@ -1,12 +1,12 @@
 package v1
 
 import (
-	"NULL/knowledgebase/models"
-	"NULL/knowledgebase/pkg/app"
-	"NULL/knowledgebase/pkg/e"
-	"NULL/knowledgebase/pkg/util"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"knowledgebase/models"
+	"knowledgebase/pkg/app"
+	"knowledgebase/pkg/e"
+	"knowledgebase/pkg/util"
 	"log"
 	"net/http"
 	"strconv"
@@ -20,12 +20,21 @@ type ReplyForm struct {
 	Author   string `json:"author"`
 	Account  string `json:"account"`
 	Deptname string `json:"deptname"`
+	JGDM     string `json:"jgdm"`
+	JGMC     string `json:"jgmc"`
 }
 
 type RpResp struct {
 	*models.Reply
 	Comments []*CtResp
 	Agreed   bool `json:"agreed"`
+}
+
+type RpResp1 struct {
+	*models.Reply
+	Comments []*CtResp1
+	Kind     string `json:"kind"`
+	Title    string `json:"title"`
 }
 
 func PostReply(c *gin.Context) {
@@ -45,17 +54,31 @@ func PostReply(c *gin.Context) {
 	}
 	t := time.Now().Format("2006-01-02 15:04:05")
 	reply := &models.Reply{
-		ID:       "RE-" + util.RandomString(29),
-		TopicID:  form.TopicID,
-		Content:  form.Content,
-		Author:   form.Author,
-		Account:  form.Account,
-		Deptname: form.Deptname,
-		Floor:    floor,
-		Uptime:   t,
+		ID:         "RE-" + util.RandomString(29),
+		TopicID:    form.TopicID,
+		Content:    form.Content,
+		Author:     form.Author,
+		Account:    form.Account,
+		Deptname:   form.Deptname,
+		Floor:      floor,
+		Createtime: t,
+		Uptime:     t,
+		JGDM:       form.JGDM,
+		JGMC:       form.JGMC,
 	}
 	if err := models.CreateReply(reply); err != nil {
 		appG.Response(http.StatusInternalServerError, e.ERROR, err)
+		return
+	}
+
+	// 更新帖子回复时间
+	topicmap := map[string]interface{}{
+		"uptime":       t,
+		"last_publish": form.Author,
+		"id":           form.TopicID,
+	}
+	if err := models.EditTopic1(topicmap); err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR, "更新回帖时间失败")
 		return
 	}
 
@@ -216,8 +239,8 @@ func GetReplies(c *gin.Context) {
 	}
 
 	//浏览量+1
-	models.AddBrowse(topicId)
-	BroadCastCount()
+	//models.AddBrowse(topicId)
+	//BroadCastCount()
 
 	replies, err := models.GetReplies(topicId, pageNo, pageSize)
 	if err != nil {
@@ -246,6 +269,7 @@ func GetReplies(c *gin.Context) {
 	}
 	appG.Response(http.StatusOK, e.SUCCESS, nil)
 }
+
 func ReplyAgree(c *gin.Context) {
 	var appG = app.Gin{C: c}
 	id := c.Param("id")
@@ -269,6 +293,7 @@ func ReplyAgree(c *gin.Context) {
 	}
 	appG.Response(http.StatusOK, e.SUCCESS, nil)
 }
+
 func RemoveReplyAgree(c *gin.Context) {
 	var appG = app.Gin{C: c}
 	id := c.Param("id")
@@ -287,6 +312,7 @@ func RemoveReplyAgree(c *gin.Context) {
 	}
 	appG.Response(http.StatusOK, e.SUCCESS, nil)
 }
+
 func AcceptReply(c *gin.Context) {
 	var appG = app.Gin{C: c}
 	id := c.Param("id")
@@ -304,11 +330,94 @@ func AcceptReply(c *gin.Context) {
 	}
 	appG.Response(http.StatusOK, e.SUCCESS, nil)
 }
+
+// 删除评论
 func DelReply(c *gin.Context) {
 	var appG = app.Gin{C: c}
 	if err := models.DelReply(c.Param("id")); err != nil {
 		appG.Response(http.StatusInternalServerError, e.ERROR, err)
 		return
 	}
+
+	var index = "reply"
+	errMsg := models.ESDeleteSingle(index, c.Param("id"))
+	if errMsg != nil {
+		log.Println("EsDeleteSingle err:", errMsg)
+	} else {
+		log.Println("EsDeleteSingle: ok")
+	}
+
 	appG.Response(http.StatusOK, e.SUCCESS, nil)
+}
+
+// 我的回帖和评论
+func GetRepCom(c *gin.Context) {
+
+	type user struct {
+		Account  string `json:"account"`
+		PageSize int    `json:"pagesize"`
+		PageNo   int    `json:"pageno"`
+	}
+
+	var (
+		appG = app.Gin{C: c}
+		form user
+	)
+
+	httpCode, errCode := app.BindAndValid(c, &form)
+	if errCode != e.SUCCESS {
+		appG.Response(httpCode, errCode, nil)
+		return
+	}
+
+	var data = make([]interface{}, 0)
+
+	replies, err := models.ComGetReplies(form.Account, form.PageNo, form.PageSize)
+	if err != nil {
+		log.Println(err)
+		appG.Response(http.StatusInternalServerError, e.ERROR, err)
+		return
+	}
+
+	if len(replies) > 0 {
+		for _, rp := range replies {
+			ctResps := make([]*CtResp1, 0)
+			for _, ct := range rp.Comments {
+				comment := ct
+				ctResps = append(ctResps, &CtResp1{&comment, "0", ""})
+			}
+			title := models.GetTitle(rp.TopicID)
+			//rpResps = append(rpResps, &RpResp{rp, ctResps, rpFlag})
+			data = append(data, &RpResp1{rp, ctResps, "1", title.Title})
+		}
+	} else {
+		log.Println("没查到回帖")
+	}
+
+	repliesCnt := models.GetAccountRepliesCnt(form.Account)
+
+	comments, err := models.RepGetComments(form.Account, form.PageNo, form.PageSize)
+	if err != nil {
+		log.Println(err)
+		appG.Response(http.StatusInternalServerError, e.ERROR, err)
+		return
+	}
+
+	if len(comments) > 0 {
+		for _, ct := range comments {
+			title := models.GetTitle(ct.TopicID)
+			data = append(data, &CtResp1{ct, "0", title.Title})
+		}
+	} else {
+		log.Println("没查到评论")
+	}
+
+	commentCnt := models.GetCommentCnt(form.Account)
+
+	appG.Response(http.StatusOK, e.SUCCESS,
+		map[string]interface{}{
+			"list":  data,
+			"total": commentCnt + repliesCnt,
+		})
+
 }

@@ -1,11 +1,11 @@
 package v1
 
 import (
-	"NULL/knowledgebase/models"
-	"NULL/knowledgebase/pkg/app"
-	"NULL/knowledgebase/pkg/e"
-	"NULL/knowledgebase/pkg/util"
 	"github.com/gin-gonic/gin"
+	"knowledgebase/models"
+	"knowledgebase/pkg/app"
+	"knowledgebase/pkg/e"
+	"knowledgebase/pkg/util"
 	"net/http"
 	"strconv"
 	"time"
@@ -35,6 +35,7 @@ func CancelFavorite(c *gin.Context) {
 	}
 	appG.Response(http.StatusOK, e.SUCCESS, nil)
 }
+
 func GetFavorites(c *gin.Context) {
 	var (
 		appG     = app.Gin{C: c}
@@ -67,6 +68,7 @@ func GetFavorites(c *gin.Context) {
 	}
 	appG.Response(http.StatusOK, e.SUCCESS, nil)
 }
+
 func DelFavorite(c *gin.Context) {
 	var appG = app.Gin{C: c}
 	if err := models.DelFavorite(c.Param("id")); err != nil {

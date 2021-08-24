@@ -1,0 +1,112 @@
+
+调用settle_gz（账户余额消费）的json
+url		:4550/sg
+如果调用settle_gz_pre（账户余额消费预结算） 改第10行为settle_gz_pre ，并且没有p_password字段   第18行
+url		:4550/sgp
+
+"sbjgbh":"915600000237060037060099", 				// *社保机构编号 string
+"zcm":"370101",						// 注册码	string
+"hisjyh":"7602035920200325133344",	// * HIS交易号 string
+"method":"settle_gz",				// * 方法名	string
+"yybm":"76020359",					// * 医药机构编码 	string
+"jsonPara":{
+	"p_jshid":"",					// *	结算号ID		string
+	"p_sfczhxf":"1",				// *	是否纯账户消费	string		1：是，0：否，默认为0，
+	"p_id":"372924199710160030",	// *	个人证件号		string
+	"p_lx":"3",						// *	个人证件类型 	string		1：实体卡号，2：电子医保凭证，3：身份证
+	"p_ectoken":"",					// *	令牌			string		电子医保凭证扫码接口返回，p_lx为2时必传
+	"p_grzhzf":0.01,				// *	个人账户支付	float64
+	"p_password":"123456",			// *	消费密码		string		！！！！！！！！！！
+	"p_czybh":"0001",				// *	操作员编号		string
+	"p_zjsm":"",					// 		证件说明		string
+	"p_fypd_ds":					// 		数据集			数组对象 	p_sfczhxf=1时必须传入，p_sfczhxf=0时会判断是否有医保门诊或住院结算
+			[
+				{
+					"yyxmbm":"001291",	// *	医药机构项目编码	string
+					"dj":0.01,			// *	单价				float64
+					"zje":0.01,			// *	总金额				float64		（zje=dj*sl）
+					"sl":1,				// *	数量				float64
+					"zxksbm":"000000",	// *	执行科室编码		string
+					"kdksbm":"000000",	// *	开单科室编码		string
+					"sxzfbl":0,
+					"fyfssj":"",		// *	费用发生时间		string
+					"bzsl":0,
+					"yyxmmc":"",
+					"gg":"",
+					"yyts":0,
+					"sm":"",
+					"yysm":"",
+					"yzlsh":"",
+					"sfryxm":"",
+					"gytj":"",
+					"dcyl":0,
+					"yypc":"",
+					"scqy":"",
+					"cfh":"",
+					"yzzh":"",
+					"yzsxh":"",
+					"hisyyxmbm":"001291",		// *	HIS医药机构项目编码		string		HIS使用的医药机构项目编码
+					"hisyyxmmc":"感冒止咳颗粒",	// *	HIS医药机构项目通用名	string
+					"spm":"",
+					"pzwh":"",
+					"jxm":"",
+					"bzjldw":""
+				}
+			]
+		}
+		
+		
+// 读卡获取人员基本信息（有卡）
+
+"sbjgbh":"915600000237060037060099", 				// *社保机构编号 string
+"zcm":"",							// 注册码	string
+"hisjyh":"7602035920200325133344",	// * HIS交易号 string
+"method":"read_card",				// * 方法名	string
+"yybm":"76020359",					// * 医药机构编码 	string
+“jsonPara”:{
+	"p_kh":"372924199710160030",		// 卡号		string
+	"p_czybh":"0001"					// p_czybh	string
+}
+
+
+// 获取人员基本信息（无卡）
+
+"sbjgbh":"915600000237060037060099", 				// *社保机构编号 string
+"zcm":"",							// 注册码	string
+"hisjyh":"7602035920200325133344",	// * HIS交易号 string
+"method":"query_basic_info",				// * 方法名	string
+"yybm":"76020359",	
+"jsonPara":{
+	"p_grbh":"372924199710160030",	// 个人标号	string 社会保障号码或者身份证号
+	"p_ewm":"",						// 二维码	string 电子医保凭证二维码，使用电子医保凭证时个人编号传空
+	"xm":"",							// 姓名 	string
+	"p_czybh":"0001"					// p_czybh	string
+}
+
+
+// 余额
+"sbjgbh":"915600000237060037060099", 				// *社保机构编号 string
+"zcm":"",							// 注册码	string
+"hisjyh":"7602035920200325133344",	// * HIS交易号 string
+"method":"query_zhye",				// * 方法名	string
+"yybm":"76020359",	
+"jsonPara":{
+	"p_grbh":"372924199710160030",	// 个人标号	string 社会保障号码或者身份证号
+
+	"p_czybh":"0001"					// p_czybh	string
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

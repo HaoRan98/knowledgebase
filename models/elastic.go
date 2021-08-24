@@ -157,3 +157,22 @@ func EsDeleteIndex(index string) error {
 	}
 	return nil
 }
+
+// 根据id删除
+func ESDeleteSingle(index, id string) error {
+	req := esapi.DeleteRequest{
+		Index:      index,
+		DocumentID: id,
+	}
+
+	res, err := req.Do(context.Background(), es)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+	log.Println(res.String())
+	if res.StatusCode == 200 || res.StatusCode == 404 {
+		return nil
+	}
+	return nil
+}

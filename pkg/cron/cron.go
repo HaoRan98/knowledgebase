@@ -1,11 +1,11 @@
 package cron
 
 import (
-	"NULL/knowledgebase/models"
-	"NULL/knowledgebase/pkg/export"
-	"NULL/knowledgebase/pkg/file"
-	"NULL/knowledgebase/pkg/jkxm"
 	"github.com/robfig/cron"
+	"knowledgebase/models"
+	"knowledgebase/pkg/export"
+	"knowledgebase/pkg/file"
+	"knowledgebase/pkg/jkxm"
 	"log"
 	"os"
 	"strings"

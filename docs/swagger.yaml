@@ -1,0 +1,478 @@
+basePath: /
+definitions:
+  models.Group:
+    properties:
+      account:
+        type: string
+      creator:
+        type: string
+      del:
+        type: integer
+      id:
+        type: string
+      jgdm:
+        type: string
+      jgmc:
+        type: string
+      last_chated:
+        type: string
+      members:
+        items:
+          $ref: '#/definitions/models.Member'
+        type: array
+      name:
+        type: string
+      type:
+        type: string
+      uptime:
+        type: string
+      userCnt:
+        type: integer
+    type: object
+  models.Member:
+    properties:
+      account:
+        type: string
+      deptid:
+        type: string
+      groupId:
+        type: string
+      groupName:
+        type: string
+      id:
+        type: string
+      jgdm:
+        type: string
+      jgmc:
+        type: string
+      status:
+        type: integer
+      userName:
+        type: string
+    type: object
+  v1.Group:
+    properties:
+      account:
+        type: string
+      creator:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      type:
+        type: string
+    type: object
+  v1.LabelForm:
+    properties:
+      account:
+        description: 账号
+        type: string
+      author:
+        description: 作者
+        type: string
+      content:
+        description: 内容
+        type: string
+      deptname:
+        description: 部门
+        type: string
+      id:
+        description: 标签ID
+        type: string
+      topic_id:
+        description: 帖子ID
+        type: string
+    type: object
+  v1.Member:
+    properties:
+      account:
+        type: string
+      deptid:
+        type: string
+      groupId:
+        type: string
+      groupName:
+        type: string
+      jgdm:
+        type: string
+      jgmc:
+        type: string
+      userName:
+        type: string
+    type: object
+  v1.Userinfo:
+    properties:
+      account:
+        type: string
+    type: object
+  v1.Users:
+    properties:
+      beginTime:
+        type: string
+      checked:
+        type: boolean
+      deptid:
+        type: string
+      endTime:
+        type: string
+      page:
+        type: integer
+      pageNo:
+        type: integer
+    type: object
+host: http://127.0.0.1
+info:
+  contact: {}
+  description: This is a sample Server pets
+  title: Swagger Example API
+  version: 0.0.1
+paths:
+  /api/v1/group/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID(不用传) , 团队名称 , 创建人 , 创建人账号 , 类型（0临时团队，1长期团队）
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/v1.Group'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"msg":"ok","data":nil}'
+          schema:
+            type: string
+      summary: POST方法 创建团队
+      tags:
+      - 创建团队
+  /api/v1/group/del:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 只传id
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/v1.Group'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"msg":"ok","data":nil}'
+          schema:
+            type: string
+      summary: POST方法 删除团队
+      tags:
+      - 删除团队
+  /api/v1/group/edit:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID , 团队名称 , 创建人 , 创建人账号 , 类型（0临时团队，1长期团队）
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/v1.Group'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"msg":"ok","data":nil}'
+          schema:
+            type: string
+      summary: POST方法 修改团队
+      tags:
+      - 修改团队
+  /api/v1/group/groups:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 当前账号
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/v1.Userinfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"msg":"ok","data":{[{"groupId":"qwertgh","groupName":"第一群"}]}}'
+          schema:
+            type: string
+      summary: POST方法 获取当前用户所在团队列表
+      tags:
+      - 获取当前用户所在团队列表
+  /api/v1/group/mygroups:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 只用传account
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.Group'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"msg":"ok","data":"返回值同传参列表，对象数组"}'
+          schema:
+            type: string
+      summary: POST方法 获取我创建的团队列表
+      tags:
+      - 获取我创建的团队列表
+  /api/v1/group/select:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 只传name
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/v1.Group'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"msg":"ok","data":"返回值同传参列表，对象数组"}'
+          schema:
+            type: string
+      summary: POST方法 查询团队
+      tags:
+      - 查询团队
+  /api/v1/label/agree:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 标签id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"msg":"ok","data":"点赞成功"}'
+          schema:
+            type: string
+      summary: GET方法 标签点赞
+      tags:
+      - Base
+  /api/v1/label/agree_cancel:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 标签id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"msg":"ok","data":"标签删除成功"}'
+          schema:
+            type: string
+      summary: GET方法 取消标签点赞
+      tags:
+      - Base
+  /api/v1/label/del:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 标签id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"msg":"ok","data":"标签删除成功"}'
+          schema:
+            type: string
+      summary: GET方法 删除标签
+      tags:
+      - Base
+  /api/v1/label/edit:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: '标签ID , 帖子ID , 标签内容 , 作者 , 账号 , 部门 '
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/v1.LabelForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"msg":"ok","data":"标签修改成功"}'
+          schema:
+            type: string
+      summary: POST方法 修改标签
+      tags:
+      - Base
+  /api/v1/label/post:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: '标签ID , 帖子ID , 标签内容 , 作者 , 账号 , 部门 '
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/v1.LabelForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"msg":"ok","data":"标签发布成功"}'
+          schema:
+            type: string
+      summary: POST方法 发布标签
+      tags:
+      - Base
+  /api/v1/labels:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 帖子id
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: 条数
+        in: query
+        name: pageSage
+        required: true
+        type: string
+      - description: 当前页
+        in: query
+        name: pageNo
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"msg":"ok","data":"标签列表获取成功"}'
+          schema:
+            type: string
+      summary: GET方法 获取标签列表
+      tags:
+      - Base
+  /api/v1/member/add:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID(不用传) , 团队名称 , 人 , 创账号 , 部门id , 部门名称 , 机关名称 , 机关代码
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/v1.Member'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"msg":"ok","data":nil}'
+          schema:
+            type: string
+      summary: POST方法 添加成员
+      tags:
+      - 添加成员
+  /api/v1/member/dropout:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 只传ID和account
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/v1.Member'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"msg":"ok","data":nil}'
+          schema:
+            type: string
+      summary: POST方法 退出团队或删人
+      tags:
+      - 退出团队或删人
+  /api/v1/member/list:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 只传ID
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/v1.Member'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"msg":"ok","data":"返回值为传参的对象数组"}'
+          schema:
+            type: string
+      summary: POST方法 获取团队成员列表
+      tags:
+      - 获取团队成员列表
+  /api/v1/userinfo:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: '部门ID , 选中 , 开始时间 , 结束时间 '
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/v1.Users'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"msg":"ok","data":{"list":[{"account":"test","username":"张三","deptname":"XX区信息中心","deptid":"13706130900","jgmc":"烟台市莱山区税务局","jgdm":"13706130000"}],"total":1}}'
+          schema:
+            type: string
+      summary: POST方法 用户列表
+      tags:
+      - 用户列表
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: x-token
+    type: apiKey
+swagger: "2.0"

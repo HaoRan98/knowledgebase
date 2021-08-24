@@ -1,10 +1,10 @@
 package jkxm
 
 import (
-	"NULL/knowledgebase/models"
-	"NULL/knowledgebase/pkg/logging"
-	"NULL/knowledgebase/pkg/util"
 	"fmt"
+	"knowledgebase/models"
+	"knowledgebase/pkg/logging"
+	"knowledgebase/pkg/util"
 	"strings"
 	"time"
 )

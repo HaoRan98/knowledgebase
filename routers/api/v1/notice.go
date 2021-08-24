@@ -1,11 +1,11 @@
 package v1
 
 import (
-	"NULL/knowledgebase/models"
-	"NULL/knowledgebase/pkg/app"
-	"NULL/knowledgebase/pkg/e"
-	"NULL/knowledgebase/pkg/util"
 	"github.com/gin-gonic/gin"
+	"knowledgebase/models"
+	"knowledgebase/pkg/app"
+	"knowledgebase/pkg/e"
+	"knowledgebase/pkg/util"
 	"net/http"
 	"strconv"
 )
